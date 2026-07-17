@@ -1,3 +1,203 @@
-/* You can add global styles to this file, and also import other style files */
-
 @import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ * Thèmes = 2 couches. La BASE (claire ou sombre) fixe le châssis et la
+ * palette des badges de statut (tunée pour un fond sombre ou clair).
+ * L'IDENTITÉ (bleu / rouge / vert menthe) surcharge la famille d'accent.
+ * Inspiré de Visual Studio Code.
+ * ------------------------------------------------------------------ */
+
+/* --- Base sombre (partagée par dark, dark-red, dark-mint) --- */
+:root,
+:root[data-theme='dark'],
+:root[data-theme='dark-red'],
+:root[data-theme='dark-mint'] {
+  color-scheme: dark;
+  --vscode-titlebar-bg: #3c3c3c;
+  --vscode-activitybar-bg: #333333;
+  --vscode-activitybar-fg: #858585;
+  --vscode-activitybar-fg-active: #ffffff;
+  --vscode-sidebar-bg: #252526;
+  --vscode-editor-bg: #1e1e1e;
+  --vscode-tabs-bg: #252526;
+  --vscode-tab-active-bg: #1e1e1e;
+  --vscode-tab-inactive-bg: #2d2d2d;
+  --vscode-border: #2b2b2b;
+  --vscode-fg: #cccccc;
+  --vscode-fg-dim: #969696;
+  --vscode-link: #3794ff;
+  --vscode-watermark: #2f2f2f;
+  --vscode-list-hover: #2a2d2e;
+  --vscode-input-bg: #3c3c3c;
+  --vscode-hover-bg: rgba(255, 255, 255, 0.1);
+  --vscode-button-secondary-bg: rgba(255, 255, 255, 0.1);
+  --vscode-button-secondary-hover-bg: rgba(255, 255, 255, 0.16);
+  --vscode-dialog-bg: #252526;
+  --vscode-dialog-border: #454545;
+  /* Badges de statut — palette sombre (texte clair sur fond sombre). */
+  --vscode-status-neutral-fg: #cccccc;
+  --vscode-status-neutral-border: #6b6b6b;
+  --vscode-status-info-fg: #4fc1ff;
+  --vscode-status-info-border: #2d5f7d;
+  --vscode-status-warning-fg: #e2b93d;
+  --vscode-status-warning-border: #7d6a2d;
+  --vscode-status-success-fg: #73c991;
+  --vscode-status-success-border: #37664a;
+  --vscode-status-danger-fg: #f48771;
+  --vscode-status-danger-border: #7d3a2d;
+}
+
+/* --- Base claire (partagée par light, light-mint) --- */
+:root[data-theme='light'],
+:root[data-theme='light-mint'] {
+  color-scheme: light;
+  --vscode-titlebar-bg: #e8e8e8;
+  --vscode-activitybar-bg: #f3f3f3;
+  --vscode-activitybar-fg: #616161;
+  --vscode-sidebar-bg: #f3f3f3;
+  --vscode-editor-bg: #ffffff;
+  --vscode-tabs-bg: #ececec;
+  --vscode-tab-active-bg: #ffffff;
+  --vscode-tab-inactive-bg: #e2e2e2;
+  --vscode-border: #cfcfcf;
+  --vscode-fg: #1f1f1f;
+  --vscode-fg-dim: #6b6b6b;
+  --vscode-link: #0066cc;
+  --vscode-watermark: #e4e4e4;
+  --vscode-list-hover: #e6e6e6;
+  --vscode-input-bg: #ffffff;
+  --vscode-hover-bg: rgba(0, 0, 0, 0.06);
+  --vscode-button-secondary-bg: rgba(0, 0, 0, 0.06);
+  --vscode-button-secondary-hover-bg: rgba(0, 0, 0, 0.12);
+  --vscode-dialog-bg: #ffffff;
+  --vscode-dialog-border: #c8c8c8;
+  /* Badges de statut — palette claire (texte foncé sur fond clair). */
+  --vscode-status-neutral-fg: #57606a;
+  --vscode-status-neutral-border: #afb8c1;
+  --vscode-status-info-fg: #0969da;
+  --vscode-status-info-border: #a5c8ed;
+  --vscode-status-warning-fg: #9a6700;
+  --vscode-status-warning-border: #d9b551;
+  --vscode-status-success-fg: #1a7f37;
+  --vscode-status-success-border: #86c79b;
+  --vscode-status-danger-fg: #cf222e;
+  --vscode-status-danger-border: #e5a5ab;
+}
+
+/* --- Identité d'accent : bleu (défaut sombre) --- */
+:root,
+:root[data-theme='dark'] {
+  --vscode-activitybar-fg-active: #ffffff;
+  --vscode-accent: #007acc;
+  --vscode-accent-hover: #0062a3;
+  --vscode-accent-soft: rgba(0, 122, 204, 0.22);
+  --vscode-accent-soft-strong: rgba(0, 122, 204, 0.32);
+  --vscode-statusbar-bg: #007acc;
+  --vscode-statusbar-detached-bg: #68217a;
+}
+
+/* --- Identité d'accent : rouge sombre --- */
+:root[data-theme='dark-red'] {
+  --vscode-activitybar-fg-active: #ffffff;
+  --vscode-accent: #d13438;
+  --vscode-accent-hover: #b02b2f;
+  --vscode-accent-soft: rgba(209, 52, 56, 0.22);
+  --vscode-accent-soft-strong: rgba(209, 52, 56, 0.32);
+  --vscode-statusbar-bg: #d13438;
+  --vscode-statusbar-detached-bg: #7a1f22;
+}
+
+/* --- Identité d'accent : vert menthe sombre --- */
+:root[data-theme='dark-mint'] {
+  --vscode-activitybar-fg-active: #ffffff;
+  --vscode-accent: #26a37d;
+  --vscode-accent-hover: #1e8163;
+  --vscode-accent-soft: rgba(38, 163, 125, 0.22);
+  --vscode-accent-soft-strong: rgba(38, 163, 125, 0.32);
+  --vscode-statusbar-bg: #26a37d;
+  --vscode-statusbar-detached-bg: #14503f;
+}
+
+/* --- Identité d'accent : rouge clair --- */
+:root[data-theme='light'] {
+  --vscode-activitybar-fg-active: #c62828;
+  --vscode-accent: #c62828;
+  --vscode-accent-hover: #a51f1f;
+  --vscode-accent-soft: rgba(198, 40, 40, 0.13);
+  --vscode-accent-soft-strong: rgba(198, 40, 40, 0.22);
+  --vscode-statusbar-bg: #c62828;
+  --vscode-statusbar-detached-bg: #7f1010;
+}
+
+/* --- Identité d'accent : vert menthe clair --- */
+:root[data-theme='light-mint'] {
+  --vscode-activitybar-fg-active: #0f8a5f;
+  --vscode-accent: #0f8a5f;
+  --vscode-accent-hover: #0b6e4b;
+  --vscode-accent-soft: rgba(15, 138, 95, 0.13);
+  --vscode-accent-soft-strong: rgba(15, 138, 95, 0.22);
+  --vscode-statusbar-bg: #0f8a5f;
+  --vscode-statusbar-detached-bg: #0a4d35;
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: var(--vscode-editor-bg);
+  color: var(--vscode-fg);
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  font-size: 13px;
+  user-select: none;
+  cursor: default;
+}
+
+:focus-visible {
+  outline: 1px solid var(--vscode-accent);
+  outline-offset: -1px;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(121, 121, 121, 0.4);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(121, 121, 121, 0.7);
+}
+
+/* Aperçu de drag CDK : le clone est apposé sur <body>, hors de la portée
+   des styles encapsulés des composants — styles globaux obligatoires. */
+.cdk-drag-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 10px;
+  height: 35px;
+  box-sizing: border-box;
+  background: var(--vscode-tab-active-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+  border: 1px solid var(--vscode-accent);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+}
+
+.cdk-drag-animating {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}

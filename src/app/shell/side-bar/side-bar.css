@@ -1,0 +1,171 @@
+.side-bar {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--vscode-sidebar-bg);
+  overflow-y: auto;
+}
+
+.side-bar-header {
+  padding: 10px 20px;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vscode-fg-dim);
+}
+
+.side-bar-section-title {
+  padding: 6px 20px 2px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--vscode-fg);
+}
+
+/* Sections repliables de l'explorateur (accordéon). */
+.accordion-header {
+  margin: 0;
+}
+
+.accordion-toggle {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  padding: 4px 20px 4px 8px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-fg);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accordion-toggle:hover {
+  background: var(--vscode-list-hover);
+}
+
+.accordion-chevron {
+  display: inline-block;
+  font-size: 10px;
+  color: var(--vscode-fg-dim);
+  transition: transform 0.12s ease;
+}
+
+.accordion-toggle[aria-expanded='true'] .accordion-chevron,
+.group-toggle[aria-expanded='true'] .accordion-chevron {
+  transform: rotate(90deg);
+}
+
+/* Groupe de l'arbre Modules : en-tête repliable (pictogramme + titre). */
+.group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 20px 4px 12px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-fg);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.group-toggle:hover {
+  background: var(--vscode-list-hover);
+}
+
+.side-bar-list {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.group-children {
+  margin: 0;
+}
+
+.side-bar-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 20px;
+  border: none;
+  background: transparent;
+  color: var(--vscode-fg);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* Éléments de l'arbre Modules : indentation par niveau. */
+.side-bar-item.module-item {
+  padding-left: 12px;
+}
+
+.side-bar-item.child {
+  padding-left: 38px;
+}
+
+.side-bar-item:hover {
+  background: var(--vscode-list-hover);
+}
+
+/* Emplacement du chevron (aligne les pictogrammes des items sans enfants). */
+.twistie {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 14px;
+}
+
+.module-icon {
+  flex: 0 0 auto;
+  color: var(--vscode-fg-dim);
+}
+
+.side-bar-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.side-bar-empty {
+  padding: 4px 20px;
+  color: var(--vscode-fg-dim);
+  font-size: 12px;
+  font-style: italic;
+}
+
+.side-bar-search {
+  padding: 4px 12px;
+}
+
+.side-bar-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+}
+
+.side-bar-input:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.side-bar-hint {
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--vscode-fg-dim);
+}

@@ -1,0 +1,148 @@
+<header class="title-bar" role="banner">
+  <div class="title-bar-left">
+    <svg class="app-icon" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+      <rect x="1" y="1" width="14" height="14" rx="3" fill="var(--vscode-accent)" />
+      <path d="M4.5 8l2.5 2.5L11.5 5" fill="none" stroke="#ffffff" stroke-width="1.6" />
+    </svg>
+    <nav class="menu-bar" role="menubar" aria-label="Menu principal">
+      @for (menu of menus; track menu) {
+        <div class="menu-slot">
+          <button type="button" class="menu-item" role="menuitem"
+                  aria-haspopup="true" [attr.aria-expanded]="openMenu() === menu"
+                  [class.open]="openMenu() === menu"
+                  (click)="toggleMenu(menu)" (mouseenter)="onMenuHover(menu)">
+            {{ menu }}
+          </button>
+
+          @if (openMenu() === menu) {
+            <div class="menu-dropdown" role="menu" [attr.aria-label]="menu">
+              @switch (menu) {
+                @case ('Fichier') {
+                  <button type="button" class="menu-option" role="menuitem" (click)="exit()">
+                    Quitter
+                  </button>
+                }
+                @case ('Affichage') {
+                  <div class="menu-group-label">Fenêtres ouvertes</div>
+                  @for (tab of openTabs(); track tab.id) {
+                    <button type="button" class="menu-option" role="menuitem"
+                            [class.current]="tab.id === activeTabId()"
+                            (click)="activateTab(tab.id)">
+                      <span class="menu-option-title">
+                        @if (tab.dirty) {
+                          <span class="menu-dirty-dot" aria-label="Modifications non enregistrées"
+                                title="Modifications non enregistrées">●</span>
+                        }
+                        <span class="menu-option-label">{{ tab.title }}</span>
+                      </span>
+                      @if (tab.id === activeTabId()) {
+                        <span class="menu-badge">courante</span>
+                      }
+                    </button>
+                  } @empty {
+                    <span class="menu-empty">Aucune fenêtre ouverte</span>
+                  }
+                }
+                @case ('Aide') {
+                  <button type="button" class="menu-option" role="menuitem" (click)="openAbout()">
+                    Version
+                  </button>
+                }
+                @default {
+                  <span class="menu-empty">Aucune commande disponible</span>
+                }
+              }
+            </div>
+          }
+        </div>
+      }
+    </nav>
+  </div>
+
+  @if (openMenu()) {
+    <div class="menu-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  }
+
+  <div class="title-bar-title">{{ title() }}</div>
+
+  <div class="title-bar-right">
+    <div class="layout-controls">
+      <button type="button" class="layout-control"
+              [class.on]="sidebarVisible()"
+              [attr.aria-pressed]="sidebarVisible()"
+              aria-label="Afficher ou masquer le panneau latéral"
+              title="Panneau latéral (Ctrl+B)"
+              (click)="toggleSidebar.emit()">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="1" fill="none" stroke="currentColor" />
+          @if (sidebarVisible()) {
+            <rect x="2.75" y="3.75" width="3.5" height="8.5" fill="currentColor" />
+          } @else {
+            <path d="M7.5 2.5v11" stroke="currentColor" />
+          }
+        </svg>
+      </button>
+      <button type="button" class="layout-control"
+              [class.on]="panelVisible()"
+              [attr.aria-pressed]="panelVisible()"
+              aria-label="Afficher ou masquer le panneau inférieur"
+              title="Panneau inférieur (Ctrl+ù)"
+              (click)="togglePanel.emit()">
+        <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+          <rect x="1.5" y="2.5" width="13" height="11" rx="1" fill="none" stroke="currentColor" />
+          @if (panelVisible()) {
+            <rect x="2.75" y="9.25" width="10.5" height="3" fill="currentColor" />
+          } @else {
+            <path d="M1.5 9.5h13" stroke="currentColor" />
+          }
+        </svg>
+      </button>
+    </div>
+    @if (electron.isElectron) {
+      <div class="window-controls">
+        <button type="button" class="window-control" aria-label="Réduire" title="Réduire"
+                (click)="minimize()">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M0 5h10" stroke="currentColor" />
+          </svg>
+        </button>
+        <button type="button" class="window-control"
+                [attr.aria-label]="electron.maximized() ? 'Restaurer' : 'Agrandir'"
+                [title]="electron.maximized() ? 'Restaurer' : 'Agrandir'"
+                (click)="toggleMaximize()">
+          @if (electron.maximized()) {
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <path d="M2.5 2.5v-2h7v7h-2" fill="none" stroke="currentColor" />
+              <rect x="0.5" y="2.5" width="7" height="7" fill="none" stroke="currentColor" />
+            </svg>
+          } @else {
+            <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+              <rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor" />
+            </svg>
+          }
+        </button>
+        <button type="button" class="window-control window-control-close" aria-label="Fermer"
+                title="Fermer" (click)="close()">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M0 0l10 10M10 0L0 10" stroke="currentColor" />
+          </svg>
+        </button>
+      </div>
+    }
+  </div>
+</header>
+
+@if (aboutOpen()) {
+  <div class="about-backdrop" (click)="closeAbout()">
+    <div class="about-dialog" role="dialog" aria-modal="true" aria-labelledby="about-title"
+         (click)="$event.stopPropagation()">
+      <svg class="about-icon" width="40" height="40" viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" rx="3" fill="var(--vscode-accent)" />
+        <path d="M4.5 8l2.5 2.5L11.5 5" fill="none" stroke="#ffffff" stroke-width="1.6" />
+      </svg>
+      <h2 class="about-name" id="about-title">{{ appName }}</h2>
+      <p class="about-version">Version {{ version() ?? 'inconnue' }}</p>
+      <button type="button" class="about-close" (click)="closeAbout()">Fermer</button>
+    </div>
+  </div>
+}

@@ -1,0 +1,80 @@
+:host {
+  display: block;
+  height: 100vh;
+}
+
+.shell {
+  display: grid;
+  grid-template-rows: 35px 1fr 22px;
+  /* Colonne bornée à la largeur de la fenêtre : sans `minmax(0, 1fr)`, la
+     colonne implicite est en `min-width: auto` et s'élargit avec le contenu
+     (bande d'onglets qui déborde), décalant tout le shell. */
+  grid-template-columns: minmax(0, 1fr);
+  height: 100%;
+  background: var(--vscode-editor-bg);
+  color: var(--vscode-fg);
+}
+
+.shell-body {
+  display: flex;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.shell-sidebar {
+  /* Largeur par défaut définie côté composant (signal redimensionnable) ;
+     bornée aussi en CSS par sécurité. */
+  width: 330px;
+  flex: none;
+  min-width: 180px;
+  border-right: 1px solid var(--vscode-border);
+}
+
+.sidebar-resize-handle {
+  flex: none;
+  width: 4px;
+  margin: 0 -2px 0 -1px;
+  cursor: ew-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+.sidebar-resize-handle:hover,
+.sidebar-resize-handle:focus-visible,
+.sidebar-resize-handle.dragging {
+  background: var(--vscode-accent);
+}
+
+.shell-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.shell-editor {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+.shell-panel {
+  flex: none;
+}
+
+.panel-resize-handle {
+  flex: none;
+  height: 4px;
+  margin: -2px 0 -1px;
+  cursor: ns-resize;
+  touch-action: none;
+  z-index: 1;
+}
+
+.panel-resize-handle:hover,
+.panel-resize-handle:focus-visible,
+.panel-resize-handle.dragging {
+  background: var(--vscode-accent);
+}

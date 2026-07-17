@@ -1,0 +1,141 @@
+.order-detail {
+  padding: 16px 24px 24px;
+  max-width: 720px;
+  user-select: text;
+}
+
+.order-detail-header {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.order-detail-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 400;
+}
+
+.order-detail-mode {
+  font-size: 11px;
+  padding: 1px 8px;
+  border-radius: 9px;
+  border: 1px solid var(--vscode-accent);
+  color: var(--vscode-status-info-fg);
+}
+
+.order-detail-mode.readonly {
+  border-color: var(--vscode-status-neutral-border);
+  color: var(--vscode-fg-dim);
+}
+
+.order-detail-dirty {
+  color: var(--vscode-status-warning-fg);
+  font-size: 12px;
+}
+
+.order-detail-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px 20px;
+  margin: 0;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+}
+
+.field-wide {
+  grid-column: 1 / -1;
+}
+
+.field-label {
+  font-size: 12px;
+  color: var(--vscode-fg-dim);
+}
+
+.field-value {
+  margin: 0;
+  font-size: 13px;
+  min-height: 20px;
+  white-space: pre-wrap;
+}
+
+.field-value.mono {
+  font-family: Consolas, 'Courier New', monospace;
+  font-size: 12px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.field input:disabled {
+  color: var(--vscode-fg-dim);
+}
+
+.field textarea {
+  resize: vertical;
+}
+
+.order-detail-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.action-primary,
+.action-secondary {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.action-primary {
+  background: var(--vscode-accent);
+  color: #ffffff;
+}
+
+.action-primary:hover:not(:disabled) {
+  background: var(--vscode-accent-hover);
+}
+
+.action-secondary {
+  background: var(--vscode-button-secondary-bg);
+  color: var(--vscode-fg);
+}
+
+.action-secondary:hover:not(:disabled) {
+  background: var(--vscode-button-secondary-hover-bg);
+}
+
+.action-primary:disabled,
+.action-secondary:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.order-detail-missing {
+  padding: 24px;
+  color: var(--vscode-fg-dim);
+}

@@ -1,0 +1,64 @@
+<div class="login-shell">
+  @if (electron.isElectron) {
+    <header class="login-titlebar">
+      <span class="login-app-name">Desktop App</span>
+      <div class="login-window-controls">
+        <button type="button" class="login-window-control" aria-label="Réduire"
+                title="Réduire" (click)="minimize()">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M0 5h10" stroke="currentColor" />
+          </svg>
+        </button>
+        <button type="button" class="login-window-control login-window-control-close"
+                aria-label="Fermer" title="Fermer" (click)="close()">
+          <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+            <path d="M0 0l10 10M10 0L0 10" stroke="currentColor" />
+          </svg>
+        </button>
+      </div>
+    </header>
+  }
+
+  <main class="login-main">
+    <form class="login-card" [formGroup]="form" (ngSubmit)="onSubmit()">
+      <svg class="login-logo" width="40" height="40" viewBox="0 0 16 16" aria-hidden="true">
+        <rect x="1" y="1" width="14" height="14" rx="3" fill="var(--vscode-accent)" />
+        <path d="M4.5 8l2.5 2.5L11.5 5" fill="none" stroke="#ffffff" stroke-width="1.6" />
+      </svg>
+      <h1 class="login-title">Connexion</h1>
+      <p class="login-subtitle">Connectez-vous pour ouvrir votre espace de travail.</p>
+
+      <label class="login-field">
+        <span class="login-label">Adresse e-mail</span>
+        <input class="login-input" type="email" formControlName="email"
+               autocomplete="username" autofocus spellcheck="false" />
+        @if (form.controls.email.touched && form.controls.email.invalid) {
+          <span class="login-field-error">
+            @if (form.controls.email.hasError('required')) {
+              L'adresse e-mail est requise.
+            } @else {
+              L'adresse e-mail est invalide.
+            }
+          </span>
+        }
+      </label>
+
+      <label class="login-field">
+        <span class="login-label">Mot de passe</span>
+        <input class="login-input" type="password" formControlName="password"
+               autocomplete="current-password" />
+        @if (form.controls.password.touched && form.controls.password.hasError('required')) {
+          <span class="login-field-error">Le mot de passe est requis.</span>
+        }
+      </label>
+
+      @if (error(); as message) {
+        <p class="login-error" role="alert">{{ message }}</p>
+      }
+
+      <button class="login-submit" type="submit" [disabled]="submitting()">
+        {{ submitting() ? 'Connexion…' : 'Se connecter' }}
+      </button>
+    </form>
+  </main>
+</div>

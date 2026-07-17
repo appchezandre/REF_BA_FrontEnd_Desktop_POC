@@ -1,0 +1,95 @@
+@if (order(); as o) {
+  <div class="order-detail">
+    <header class="order-detail-header">
+      <h2>Commande {{ orderNumber() }}</h2>
+      @if (editing()) {
+        <span class="order-detail-mode">Édition</span>
+        @if (dirty()) {
+          <span class="order-detail-dirty">Modifications non enregistrées</span>
+        }
+      } @else {
+        <span class="order-detail-mode readonly">Lecture seule</span>
+      }
+    </header>
+
+    @if (editing() && draft(); as d) {
+      <form class="order-detail-body" (submit)="onSubmit($event)">
+        <div class="order-detail-fields">
+          <label class="field">
+            <span class="field-label">N° commande (clé)</span>
+            <input type="text" [value]="orderNumber()" disabled />
+          </label>
+          <label class="field">
+            <span class="field-label">Client</span>
+            <input type="text" [value]="d.customer" required
+                   (input)="updateField('customer', $event)" />
+          </label>
+          <label class="field">
+            <span class="field-label">Date</span>
+            <input type="date" [value]="d.date" required
+                   (change)="updateField('date', $event)" />
+          </label>
+          <label class="field">
+            <span class="field-label">Statut</span>
+            <select [value]="d.status" (change)="updateField('status', $event)">
+              @for (status of statuses; track status) {
+                <option [value]="status" [selected]="status === d.status">
+                  {{ statusLabels[status] }}
+                </option>
+              }
+            </select>
+          </label>
+          <label class="field field-wide">
+            <span class="field-label">Notes</span>
+            <textarea rows="4" [value]="d.notes"
+                      (input)="updateField('notes', $event)"></textarea>
+          </label>
+        </div>
+
+        <footer class="order-detail-actions">
+          <button type="submit" class="action-primary" [disabled]="!dirty()">
+            Enregistrer
+          </button>
+          <button type="button" class="action-secondary" (click)="cancel()">
+            Annuler
+          </button>
+        </footer>
+      </form>
+    } @else {
+      <div class="order-detail-body">
+        <dl class="order-detail-fields">
+          <div class="field">
+            <dt class="field-label">N° commande (clé)</dt>
+            <dd class="field-value mono">{{ o.orderNumber }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Client</dt>
+            <dd class="field-value">{{ o.customer }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Date</dt>
+            <dd class="field-value">{{ o.date }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Statut</dt>
+            <dd class="field-value">{{ statusLabels[o.status] }}</dd>
+          </div>
+          <div class="field field-wide">
+            <dt class="field-label">Notes</dt>
+            <dd class="field-value">{{ o.notes || '—' }}</dd>
+          </div>
+        </dl>
+
+        <footer class="order-detail-actions">
+          <button type="button" class="action-primary" (click)="beginEdit()">
+            Modifier
+          </button>
+        </footer>
+      </div>
+    }
+  </div>
+} @else {
+  <p class="order-detail-missing">
+    La commande {{ orderNumber() }} est introuvable.
+  </p>
+}

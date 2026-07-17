@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# Electron Builder (packaged app)
+/release
+
 # Node
 /node_modules
 npm-debug.log
@@ -42,3 +45,9 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Graphify (generated knowledge graph)
+/graphify-out
+
+# Claude Code (paramètres personnels locaux)
+.claude/settings.local.json

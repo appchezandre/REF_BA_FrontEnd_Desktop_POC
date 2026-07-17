@@ -1,0 +1,80 @@
+.welcome {
+  height: 100%;
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.welcome-inner {
+  max-width: 720px;
+  width: 100%;
+  padding: 48px 32px;
+}
+
+.welcome-title {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 300;
+  color: var(--vscode-fg);
+}
+
+.welcome-subtitle {
+  margin: 4px 0 32px;
+  font-size: 15px;
+  color: var(--vscode-fg-dim);
+}
+
+.welcome-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+
+.welcome-section h2 {
+  font-size: 16px;
+  font-weight: 400;
+  margin: 0 0 10px;
+  color: var(--vscode-fg);
+}
+
+.welcome-links,
+.welcome-shortcuts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.welcome-link {
+  border: none;
+  background: transparent;
+  padding: 3px 0;
+  color: var(--vscode-link);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.welcome-link:hover {
+  text-decoration: underline;
+}
+
+.welcome-shortcuts li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  color: var(--vscode-fg-dim);
+  font-size: 13px;
+}
+
+kbd {
+  padding: 2px 6px;
+  border-radius: 3px;
+  background: rgba(128, 128, 128, 0.17);
+  border: 1px solid rgba(128, 128, 128, 0.35);
+  border-bottom-width: 2px;
+  font-family: inherit;
+  font-size: 11px;
+  color: var(--vscode-fg);
+  white-space: nowrap;
+}

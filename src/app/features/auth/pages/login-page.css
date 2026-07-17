@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.login-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--vscode-editor-bg);
+  color: var(--vscode-fg);
+}
+
+/* Fenêtre sans cadre : la bande de titre sert de zone de déplacement. */
+.login-titlebar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 32px;
+  padding-left: 12px;
+  -webkit-app-region: drag;
+  background: var(--vscode-titlebar-bg);
+}
+
+.login-app-name {
+  font-size: 12px;
+  color: var(--vscode-fg-dim);
+}
+
+.login-window-controls {
+  display: flex;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.login-window-control {
+  width: 46px;
+  height: 100%;
+  border: none;
+  background: transparent;
+  color: var(--vscode-fg);
+  cursor: default;
+}
+
+.login-window-control:hover {
+  background: rgba(128, 128, 128, 0.25);
+}
+
+.login-window-control-close:hover {
+  background: #e81123;
+  color: #ffffff;
+}
+
+.login-main {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  width: 320px;
+  padding: 32px;
+}
+
+.login-logo {
+  align-self: center;
+}
+
+.login-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.login-subtitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--vscode-fg-dim);
+  text-align: center;
+}
+
+.login-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.login-label {
+  font-size: 13px;
+}
+
+.login-input {
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.login-input:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.login-field-error,
+.login-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--vscode-status-danger-fg);
+}
+
+.login-submit {
+  margin-top: 6px;
+  padding: 7px 12px;
+  border: none;
+  background: var(--vscode-accent);
+  color: #ffffff;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.login-submit:hover:not(:disabled) {
+  background: var(--vscode-accent-hover);
+}
+
+.login-submit:focus-visible {
+  outline: 1px solid var(--vscode-fg);
+  outline-offset: 2px;
+}
+
+.login-submit:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

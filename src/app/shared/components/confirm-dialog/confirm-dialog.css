@@ -1,0 +1,72 @@
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.dialog {
+  width: min(420px, calc(100vw - 48px));
+  padding: 20px;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-dialog-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  color: var(--vscode-fg);
+}
+
+.dialog-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.dialog-message {
+  margin: 0 0 20px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--vscode-fg);
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.dialog-button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.dialog-cancel {
+  background: var(--vscode-button-secondary-bg);
+  color: var(--vscode-fg);
+}
+
+.dialog-cancel:hover {
+  background: var(--vscode-button-secondary-hover-bg);
+}
+
+.dialog-confirm-primary {
+  background: var(--vscode-accent);
+  color: #ffffff;
+}
+
+.dialog-confirm-primary:hover {
+  background: var(--vscode-accent-hover);
+}
+
+.dialog-confirm-danger {
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+.dialog-confirm-danger:hover {
+  background: #a82418;
+}

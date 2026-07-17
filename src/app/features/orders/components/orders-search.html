@@ -1,0 +1,62 @@
+<div class="orders-search">
+  <label class="search-field">
+    <span class="search-label">Recherche (tous les champs)</span>
+    <input type="search" class="search-input" [value]="screen().searchText()"
+           placeholder="Client, notes, montant…" aria-label="Recherche texte"
+           (input)="onText($event)" />
+  </label>
+
+  <label class="search-field">
+    <span class="search-label">N° de commande</span>
+    <input type="search" class="search-input" [value]="screen().searchNumber()"
+           placeholder="CMD-2026-…" aria-label="Recherche par n° de commande"
+           (input)="onNumber($event)" />
+  </label>
+
+  <label class="search-field">
+    <span class="search-label">Statut</span>
+    <select class="search-input" [value]="screen().searchStatus()"
+            aria-label="Filtrer par statut" (change)="onStatus($event)">
+      <option value="all">Tous les statuts</option>
+      @for (status of statuses; track status) {
+        <option [value]="status" [selected]="status === screen().searchStatus()">
+          {{ statusLabels[status] }}
+        </option>
+      }
+    </select>
+  </label>
+
+  <fieldset class="search-range">
+    <legend class="search-label">Date (bornes incluses)</legend>
+    <div class="search-range-row">
+      <input type="date" class="search-input" [value]="screen().dateFrom()"
+             aria-label="Date de début" (input)="onDateFrom($event)" />
+      <span class="search-range-sep">→</span>
+      <input type="date" class="search-input" [value]="screen().dateTo()"
+             aria-label="Date de fin" (input)="onDateTo($event)" />
+    </div>
+  </fieldset>
+
+  <fieldset class="search-range">
+    <legend class="search-label">Total HT (€, bornes incluses)</legend>
+    <div class="search-range-row">
+      <input type="number" class="search-input" min="0" step="0.01"
+             [value]="screen().amountMin() ?? ''" placeholder="Min"
+             aria-label="Montant minimum" (input)="onAmountMin($event)" />
+      <span class="search-range-sep">→</span>
+      <input type="number" class="search-input" min="0" step="0.01"
+             [value]="screen().amountMax() ?? ''" placeholder="Max"
+             aria-label="Montant maximum" (input)="onAmountMax($event)" />
+    </div>
+  </fieldset>
+
+  <div class="search-footer">
+    <span class="search-count">
+      {{ screen().filteredOrders().length }} résultat(s)
+    </span>
+    <button type="button" class="search-clear" [disabled]="!screen().hasActiveSearch()"
+            (click)="clear()">
+      Effacer
+    </button>
+  </div>
+</div>

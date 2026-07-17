@@ -1,0 +1,21 @@
+<div class="settings-page">
+  <h2 class="settings-title">Paramètres</h2>
+
+  <section class="settings-section">
+    <h3 class="settings-section-title">Apparence</h3>
+    <label class="settings-field">
+      <span class="settings-label">Thème</span>
+      <select class="settings-select" [value]="themeService.theme()"
+              aria-label="Thème de l'application" (change)="onThemeChange($event)">
+        @for (option of themeOptions; track option.value) {
+          <option [value]="option.value" [selected]="option.value === themeService.theme()">
+            {{ option.label }}
+          </option>
+        }
+      </select>
+      <span class="settings-hint">
+        Le thème est enregistré et appliqué à toutes les fenêtres.
+      </span>
+    </label>
+  </section>
+</div>

@@ -1,16 +1,44 @@
 {
   "name": "desktop-app",
   "version": "0.0.0",
+  "description": "Application desktop métier (ERP) multi-fenêtres",
+  "author": "Pierre-yves Fevre",
+  "main": "electron/main.cjs",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "electron": "electron .",
+    "electron:dev": "concurrently -k \"npm start\" \"wait-on tcp:4200 && cross-env ELECTRON_RENDERER_URL=http://localhost:4200 electron .\"",
+    "dist": "ng build && electron-builder",
+    "dist:dir": "ng build && electron-builder --dir"
+  },
+  "build": {
+    "appId": "fr.chezandre.desktop-app",
+    "productName": "Desktop App",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "electron/**/*",
+      "dist/desktop-app/browser/**/*"
+    ],
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   },
   "private": true,
   "packageManager": "npm@11.18.0",
   "dependencies": {
+    "@angular/cdk": "^21.2.14",
     "@angular/common": "^21.2.0",
     "@angular/compiler": "^21.2.0",
     "@angular/core": "^21.2.0",
@@ -25,11 +53,16 @@
     "@angular/cli": "^21.2.7",
     "@angular/compiler-cli": "^21.2.0",
     "@tailwindcss/postcss": "^4.1.12",
+    "concurrently": "^10.0.3",
+    "cross-env": "^10.1.0",
+    "electron": "^43.1.0",
+    "electron-builder": "^26.15.3",
     "jsdom": "^28.0.0",
     "postcss": "^8.5.3",
     "prettier": "^3.8.1",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "wait-on": "^9.0.10"
   }
 }

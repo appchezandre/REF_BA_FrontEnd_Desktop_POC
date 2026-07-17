@@ -1,0 +1,48 @@
+<nav class="activity-bar" role="toolbar" aria-label="Barre d'activité" aria-orientation="vertical">
+  <div class="activity-top">
+    @for (item of items; track item.id) {
+      <button type="button" class="activity-item"
+              [class.active]="isActive(item.id)"
+              [attr.aria-pressed]="isActive(item.id)"
+              [attr.aria-label]="item.label"
+              [title]="item.label"
+              (click)="selected.emit(item.id)">
+        @switch (item.id) {
+          @case ('explorer') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" aria-hidden="true">
+              <path d="M13.5 3H8.5v14h11V8z" />
+              <path d="M13.5 3v5h5" />
+              <path d="M8.5 7h-4v14h11v-4" />
+            </svg>
+          }
+          @case ('search') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" aria-hidden="true">
+              <circle cx="10.5" cy="10.5" r="6" />
+              <path d="M15 15l6 6" />
+            </svg>
+          }
+        }
+      </button>
+    }
+  </div>
+
+  <div class="activity-bottom">
+    <button type="button" class="activity-item" aria-label="Comptes" title="Comptes">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" aria-hidden="true">
+        <circle cx="12" cy="8.5" r="4" />
+        <path d="M4.5 20.5c1-4 4-5.5 7.5-5.5s6.5 1.5 7.5 5.5" />
+      </svg>
+    </button>
+    <button type="button" class="activity-item" aria-label="Paramètres" title="Paramètres"
+            (click)="openSettings()">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.5" aria-hidden="true">
+        <circle cx="12" cy="12" r="3.5" />
+        <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" />
+      </svg>
+    </button>
+  </div>
+</nav>

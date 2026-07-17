@@ -1,0 +1,78 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.users-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.screen-tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  flex: none;
+  padding: 0 12px;
+  background: var(--vscode-sidebar-bg);
+  border-bottom: 1px solid var(--vscode-border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.screen-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 10px;
+  border: none;
+  border-bottom: 1px solid transparent;
+  background: transparent;
+  color: var(--vscode-fg-dim);
+  font-size: 12px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.screen-tab:hover {
+  color: var(--vscode-fg);
+}
+
+.screen-tab.active {
+  color: var(--vscode-fg);
+  border-bottom-color: var(--vscode-accent);
+}
+
+.screen-tab-dirty {
+  font-size: 10px;
+  color: var(--vscode-status-warning-fg);
+}
+
+.screen-tab-close {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: currentColor;
+  visibility: hidden;
+}
+
+.screen-tab-detail:hover .screen-tab-close,
+.screen-tab-detail.active .screen-tab-close {
+  visibility: visible;
+}
+
+.screen-tab-close:hover {
+  background: var(--vscode-hover-bg);
+}
+
+.screen-body {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+}

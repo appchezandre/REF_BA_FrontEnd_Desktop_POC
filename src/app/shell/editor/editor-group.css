@@ -1,0 +1,278 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.editor-group {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+}
+
+.tab-strip-row {
+  display: flex;
+  min-width: 0;
+  height: 35px;
+  background: var(--vscode-tabs-bg);
+}
+
+.tab-strip {
+  display: flex;
+  flex-wrap: nowrap;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  height: 35px;
+  padding: 0 10px;
+  max-width: 240px;
+  box-sizing: border-box;
+  background: var(--vscode-tab-inactive-bg);
+  color: var(--vscode-fg-dim);
+  border-right: 1px solid var(--vscode-border);
+  font-size: 13px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.tab.active {
+  background: var(--vscode-tab-active-bg);
+  color: var(--vscode-fg);
+}
+
+/* Liseré bleu de l'onglet actif, uniquement dans le groupe focalisé. */
+.focused .tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--vscode-accent);
+}
+
+.tab.pending {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.tab-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
+}
+
+.tab-dirty {
+  font-size: 11px;
+  line-height: 1;
+}
+
+.tab-close {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  color: currentColor;
+  visibility: hidden;
+}
+
+.tab:hover .tab-close,
+.tab.active .tab-close {
+  visibility: visible;
+}
+
+.tab-close:hover {
+  background: var(--vscode-hover-bg);
+}
+
+.tab-scroll {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 35px;
+  border: none;
+  background: var(--vscode-tabs-bg);
+  color: var(--vscode-fg-dim);
+  cursor: pointer;
+}
+
+.tab-scroll:hover {
+  color: var(--vscode-fg);
+}
+
+.tab-actions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 6px;
+}
+
+.tab-action {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--vscode-fg-dim);
+}
+
+.tab-action:hover {
+  background: var(--vscode-hover-bg);
+  color: var(--vscode-fg);
+}
+
+.editor-content {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  background: var(--vscode-editor-bg);
+}
+
+.editor-empty {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+}
+
+.editor-empty-mark {
+  color: var(--vscode-watermark);
+}
+
+.editor-empty-hints {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.editor-empty-hints li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  min-width: 260px;
+  color: var(--vscode-fg-dim);
+  font-size: 13px;
+}
+
+/* --- Guides de dock (drag-and-drop façon Visual Studio) ----------------- */
+
+.dock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.dock-preview {
+  position: absolute;
+  background: var(--vscode-accent-soft);
+  border: 1px solid var(--vscode-accent);
+  box-sizing: border-box;
+}
+
+.dock-preview.zone-center {
+  inset: 0;
+}
+
+.dock-preview.zone-left {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 50%;
+}
+
+.dock-preview.zone-right {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 50%;
+}
+
+.dock-preview.zone-top {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+}
+
+.dock-preview.zone-bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+}
+
+/* Croix de guides : cellules de 40 px + 4 px d'écart, alignées sur le
+   hit-test du TabDragService (GUIDE_HALF / GUIDE_OFFSET). */
+.dock-guides {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  grid-template-columns: repeat(3, 40px);
+  grid-template-rows: repeat(3, 40px);
+  gap: 4px;
+}
+
+.dock-guide {
+  display: grid;
+  place-items: center;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-dialog-border);
+  border-radius: 4px;
+  color: var(--vscode-fg-dim);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.guide-top {
+  grid-area: 1 / 2;
+}
+
+.guide-left {
+  grid-area: 2 / 1;
+}
+
+.guide-center {
+  grid-area: 2 / 2;
+}
+
+.guide-right {
+  grid-area: 2 / 3;
+}
+
+.guide-bottom {
+  grid-area: 3 / 2;
+}
+
+.dock-guide.active {
+  background: var(--vscode-accent);
+  border-color: var(--vscode-accent);
+  color: #ffffff;
+}

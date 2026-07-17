@@ -1,0 +1,125 @@
+<aside class="side-bar">
+  @switch (view()) {
+    @case ('explorer') {
+      <div class="side-bar-header">Explorateur</div>
+
+      <section class="accordion">
+        <h3 class="accordion-header">
+          <button type="button" class="accordion-toggle"
+                  [attr.aria-expanded]="isExpanded('screens')"
+                  aria-controls="explorer-screens"
+                  (click)="toggle('screens')">
+            <span class="accordion-chevron" aria-hidden="true">▸</span>
+            <span>Modules</span>
+          </button>
+        </h3>
+        @if (isExpanded('screens')) {
+          <ul id="explorer-screens" class="side-bar-list" role="list">
+            @for (node of modules; track nodeKey(node)) {
+              @if (node.kind === 'item') {
+                <li>
+                  <button type="button" class="side-bar-item module-item"
+                          title="Clic : ouvrir — Ctrl+clic : nouvelle instance"
+                          (click)="open(node.entry, $event)">
+                    <span class="twistie" aria-hidden="true"></span>
+                    <app-icon class="module-icon" [name]="node.icon" />
+                    <span class="side-bar-label">{{ node.entry.title }}</span>
+                  </button>
+                </li>
+              } @else {
+                <li>
+                  <button type="button" class="group-toggle"
+                          [attr.aria-expanded]="isExpanded(node.id)"
+                          [attr.aria-controls]="'group-' + node.id"
+                          (click)="toggle(node.id)">
+                    <span class="twistie accordion-chevron" aria-hidden="true">▸</span>
+                    <app-icon class="module-icon" [name]="node.icon" />
+                    <span class="side-bar-label">{{ node.title }}</span>
+                  </button>
+                  @if (isExpanded(node.id)) {
+                    <ul [id]="'group-' + node.id" class="side-bar-list group-children"
+                        role="list">
+                      @for (child of node.children; track child.entry.type) {
+                        <li>
+                          <button type="button" class="side-bar-item child"
+                                  title="Clic : ouvrir — Ctrl+clic : nouvelle instance"
+                                  (click)="open(child.entry, $event)">
+                            <app-icon class="module-icon" [name]="child.icon" />
+                            <span class="side-bar-label">{{ child.entry.title }}</span>
+                          </button>
+                        </li>
+                      }
+                    </ul>
+                  }
+                </li>
+              }
+            }
+          </ul>
+        }
+      </section>
+
+      <section class="accordion">
+        <h3 class="accordion-header">
+          <button type="button" class="accordion-toggle"
+                  [attr.aria-expanded]="isExpanded('records')"
+                  aria-controls="explorer-records"
+                  (click)="toggle('records')">
+            <span class="accordion-chevron" aria-hidden="true">▸</span>
+            <span>Fiches récentes</span>
+          </button>
+        </h3>
+        @if (isExpanded('records')) {
+          <ul id="explorer-records" class="side-bar-list" role="list">
+            @for (record of records(); track record.key) {
+              <li>
+                <button type="button" class="side-bar-item"
+                        title="Ouvrir la fiche"
+                        (click)="openRecent(record)">
+                  <app-icon class="module-icon" [name]="record.icon" />
+                  <span class="side-bar-label">{{ record.title }}</span>
+                </button>
+              </li>
+            } @empty {
+              <li class="side-bar-empty">Aucune fiche récente</li>
+            }
+          </ul>
+        }
+      </section>
+    }
+    @case ('search') {
+      <div class="side-bar-header">Rechercher</div>
+      @if (activeTab(); as tab) {
+        @switch (tab.type) {
+          @case ('order-list') {
+            <div class="side-bar-section-title">Commandes</div>
+            @defer (on immediate) {
+              <app-orders-search [tabId]="tab.id" />
+            }
+          }
+          @case ('user-list') {
+            <div class="side-bar-section-title">Utilisateurs</div>
+            @defer (on immediate) {
+              <app-users-search [tabId]="tab.id" />
+            }
+          }
+          @default {
+            <div class="side-bar-search">
+              <input type="text" class="side-bar-input" placeholder="Rechercher"
+                     aria-label="Recherche globale" />
+              <p class="side-bar-hint">
+                La recherche pour « {{ tab.title }} » sera branchée sur l'API
+                métier dans une itération ultérieure.
+              </p>
+            </div>
+          }
+        }
+      } @else {
+        <div class="side-bar-search">
+          <p class="side-bar-hint">
+            Ouvrez un écran pour effectuer une recherche contextuelle.
+          </p>
+        </div>
+      }
+    }
+  }
+</aside>

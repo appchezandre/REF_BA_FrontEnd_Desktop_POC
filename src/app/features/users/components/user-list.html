@@ -1,0 +1,285 @@
+<div class="user-list">
+  <header class="user-list-header">
+    <div class="user-list-heading">
+      <h2>Utilisateurs</h2>
+      <p class="user-list-count">
+        @if (usersService.loading()) {
+          Chargement…
+        } @else if (screen().hasActiveSearch()) {
+          {{ screen().filteredCount() }} sur {{ usersService.users().length }}
+          utilisateurs (filtres actifs)
+        } @else {
+          {{ usersService.users().length }} utilisateurs
+        }
+      </p>
+    </div>
+
+    <div class="user-list-toolbar">
+      <button type="button" class="toolbar-btn" (click)="openCreate()"
+              title="Créer un utilisateur">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.5" aria-hidden="true">
+          <path d="M8 3v10M3 8h10" stroke-linecap="round" />
+        </svg>
+        <span>Nouvel utilisateur</span>
+      </button>
+      <button type="button" class="toolbar-btn" (click)="usersService.reload()"
+              title="Recharger depuis l'API">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.5" aria-hidden="true">
+          <path d="M13 8a5 5 0 1 1-1.5-3.5M13 2v3h-3" stroke-linecap="round" />
+        </svg>
+        <span>Actualiser</span>
+      </button>
+      <button type="button" class="toolbar-btn" (click)="openSearch()"
+              title="Ouvrir la recherche">
+        <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             stroke-width="1.5" aria-hidden="true">
+          <circle cx="7" cy="7" r="4.5" />
+          <path d="M10.5 10.5L14 14" stroke-linecap="round" />
+        </svg>
+        <span>Rechercher</span>
+      </button>
+    </div>
+  </header>
+
+  @if (usersService.error(); as loadError) {
+    <div class="user-list-banner" role="alert">
+      <span>{{ loadError }}</span>
+      <button type="button" class="toolbar-btn" (click)="usersService.reload()">Réessayer</button>
+    </div>
+  }
+  @if (actionError(); as error) {
+    <div class="user-list-banner" role="alert">
+      <span>{{ error }}</span>
+    </div>
+  }
+
+  <div class="user-table-wrap" [class.resizing]="resizingColumn()">
+    <table class="user-table" [style.width.px]="tableWidth()">
+      <colgroup>
+        <col class="cg-indicator" />
+        @for (col of screen().visibleColumns(); track col.id) {
+          <col [style.width.px]="screen().columnWidth(col.id)" />
+        }
+        <col class="cg-actions" />
+      </colgroup>
+      <thead>
+        <tr cdkDropList cdkDropListOrientation="horizontal"
+            (cdkDropListDropped)="onColumnDrop($event)">
+          <th scope="col" class="indicator" aria-label="État"></th>
+          @for (col of screen().visibleColumns(); track col.id) {
+            <th cdkDrag scope="col" class="col-header-cell"
+                [class.num]="col.numeric" [attr.aria-sort]="ariaSort(col.id)">
+              <button type="button" class="col-header" cdkDragHandle
+                      (click)="toggleMenu(col.id)"
+                      aria-haspopup="menu"
+                      [attr.aria-expanded]="openMenuColumn() === col.id"
+                      title="Cliquer pour trier et gérer les colonnes — glisser pour déplacer">
+                <span class="col-header-label">{{ col.label }}</span>
+                @if (sortIndicator(col.id); as arrow) {
+                  <span class="sort-arrow" aria-hidden="true">{{ arrow }}@if (screen().sortCriteria().length > 1) {<sub class="sort-rank">{{ screen().sortRankFor(col.id) }}</sub>}</span>
+                }
+                <span class="col-caret" aria-hidden="true">▾</span>
+              </button>
+
+              @if (openMenuColumn() === col.id) {
+                <div class="hdr-menu-backdrop" (click)="closeMenu()"></div>
+                <div class="hdr-menu" role="menu" tabindex="-1"
+                     (keydown.escape)="closeMenu()"
+                     [attr.aria-label]="'Options de la colonne ' + col.label">
+                  <p class="hdr-menu-title">Tri</p>
+                  <button type="button" role="menuitem" class="hdr-menu-item"
+                          [class.active]="screen().sortDirectionFor(col.id) === 'asc'"
+                          (click)="setSort(col.id, 'asc'); closeMenu()">
+                    <span class="hdr-menu-ico">▲</span> Trier croissant
+                  </button>
+                  <button type="button" role="menuitem" class="hdr-menu-item"
+                          [class.active]="screen().sortDirectionFor(col.id) === 'desc'"
+                          (click)="setSort(col.id, 'desc'); closeMenu()">
+                    <span class="hdr-menu-ico">▼</span> Trier décroissant
+                  </button>
+                  <button type="button" role="menuitem" class="hdr-menu-item"
+                          (click)="addSort(col.id, 'asc'); closeMenu()">
+                    <span class="hdr-menu-ico">＋</span> Ajouter au tri (croissant)
+                  </button>
+                  <button type="button" role="menuitem" class="hdr-menu-item"
+                          (click)="addSort(col.id, 'desc'); closeMenu()">
+                    <span class="hdr-menu-ico">＋</span> Ajouter au tri (décroissant)
+                  </button>
+                  @if (screen().sortDirectionFor(col.id)) {
+                    <button type="button" role="menuitem" class="hdr-menu-item"
+                            (click)="removeSort(col.id); closeMenu()">
+                      <span class="hdr-menu-ico">✕</span> Retirer du tri
+                    </button>
+                  }
+                  @if (screen().sortCriteria().length) {
+                    <button type="button" role="menuitem" class="hdr-menu-item"
+                            (click)="clearSort(); closeMenu()">
+                      <span class="hdr-menu-ico">⌫</span> Effacer le tri
+                    </button>
+                  }
+                  <div class="hdr-menu-sep" role="separator"></div>
+                  <p class="hdr-menu-title">Colonnes</p>
+                  @for (c of screen().allColumns(); track c.id) {
+                    <label class="hdr-menu-check" role="menuitemcheckbox"
+                           [attr.aria-checked]="screen().isColumnVisible(c.id)">
+                      <input type="checkbox" [checked]="screen().isColumnVisible(c.id)"
+                             (change)="toggleColumn(c.id)" />
+                      <span>{{ c.label }}</span>
+                    </label>
+                  }
+                </div>
+              }
+
+              <span class="col-resize" role="separator" aria-orientation="vertical"
+                    [attr.aria-label]="'Redimensionner la colonne ' + col.label"
+                    title="Glisser pour redimensionner — double-clic pour réinitialiser"
+                    (pointerdown)="startResize(col.id, $event)"
+                    (pointermove)="onResize($event)"
+                    (pointerup)="endResize($event)"
+                    (pointercancel)="endResize($event)"
+                    (dblclick)="resetWidth(col.id)"></span>
+            </th>
+          }
+          <th scope="col" class="actions" aria-label="Actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (user of screen().pagedUsers(); track user.id) {
+          <tr class="user-row" title="Double-cliquez pour ouvrir la fiche"
+              [class.row-open]="openKeys().has(key(user))"
+              [class.row-deleted]="user.deleted"
+              (dblclick)="edit(user)">
+            <td class="indicator">
+              @if (screen().dirtyKeys().has(key(user))) {
+                <span class="row-dirty-dot"
+                      aria-label="Modifications non enregistrées"
+                      title="Modifications non enregistrées">●</span>
+              }
+            </td>
+            @for (col of screen().visibleColumns(); track col.id) {
+              <td [class.num]="col.numeric" [class.mono]="col.mono"
+                  [title]="cellValue(user, col.id)">
+                @switch (col.id) {
+                  @case ('status') {
+                    <span class="status" [class]="statusClass(user)">
+                      {{ statusLabel(user) }}
+                    </span>
+                  }
+                  @default {
+                    {{ cellValue(user, col.id) }}
+                  }
+                }
+              </td>
+            }
+            <td class="actions">
+              <button type="button" class="row-action"
+                      [attr.aria-label]="'Ouvrir la fiche de ' + user.name"
+                      title="Ouvrir la fiche" (click)="edit(user)">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                     aria-hidden="true">
+                  <path d="M11.2 2.3l2.5 2.5L5.5 13 2 14l1-3.5z" />
+                </svg>
+              </button>
+              @if (!user.deleted) {
+                <button type="button" class="row-action"
+                        [attr.aria-label]="'Supprimer ' + user.name"
+                        title="Supprimer (logique)" (click)="askDelete($event, user)">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+                       aria-hidden="true">
+                    <path d="M3 4h10M6.5 4V2.5h3V4M5 4l.7 9.5h4.6L11 4" stroke-linecap="round" />
+                  </svg>
+                </button>
+              }
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td [attr.colspan]="screen().visibleColumns().length + 2" class="user-list-empty">
+              @if (usersService.loading()) {
+                Chargement des utilisateurs…
+              } @else {
+                Aucun utilisateur ne correspond aux filtres.
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <footer class="pagination">
+    <label class="page-size">
+      <span>Lignes par page :</span>
+      <select aria-label="Nombre d'enregistrements par page"
+              [value]="pageSizeValue(screen().pageSize())"
+              (change)="onPageSizeChange($any($event.target).value)">
+        @for (size of pageSizeOptions; track size) {
+          <option [value]="pageSizeValue(size)">{{ pageSizeLabel(size) }}</option>
+        }
+      </select>
+    </label>
+
+    <span class="page-range">{{ rangeLabel() }}</span>
+
+    <div class="page-nav">
+      <button type="button" class="page-btn" aria-label="Page précédente"
+              [disabled]="screen().pageIndex() === 0"
+              (click)="screen().previousPage()">‹</button>
+      <span class="page-indicator">
+        Page {{ screen().pageIndex() + 1 }} / {{ screen().pageCount() }}
+      </span>
+      <button type="button" class="page-btn" aria-label="Page suivante"
+              [disabled]="screen().pageIndex() >= screen().pageCount() - 1"
+              (click)="screen().nextPage()">›</button>
+    </div>
+  </footer>
+</div>
+
+@if (createOpen()) {
+  <div class="create-backdrop" (click)="closeCreate()"></div>
+  <div class="create-dialog" role="dialog" aria-modal="true"
+       aria-labelledby="create-user-title" (keydown.escape)="closeCreate()">
+    <h3 id="create-user-title" class="create-title">Nouvel utilisateur</h3>
+    <form (submit)="submitCreate($event)">
+      <label class="field">
+        <span class="field-label">Nom</span>
+        <input type="text" required [value]="createName()"
+               (input)="onCreateField('name', $event)" />
+      </label>
+      <label class="field">
+        <span class="field-label">E-mail (identifiant de connexion)</span>
+        <input type="email" required [value]="createEmail()"
+               (input)="onCreateField('email', $event)" />
+      </label>
+      <label class="field">
+        <span class="field-label">Mot de passe</span>
+        <input type="password" required autocomplete="new-password"
+               [value]="createPassword()" (input)="onCreateField('password', $event)" />
+      </label>
+      @if (createError(); as error) {
+        <p class="create-error" role="alert">{{ error }}</p>
+      }
+      <footer class="create-actions">
+        <button type="submit" class="action-primary" [disabled]="creating()">
+          {{ creating() ? 'Création…' : 'Créer' }}
+        </button>
+        <button type="button" class="action-secondary" (click)="closeCreate()">
+          Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+}
+
+@if (pendingDelete(); as user) {
+  <app-confirm-dialog
+    title="Supprimer l'utilisateur ?"
+    [message]="'« ' + user.name + ' » (' + user.email + ') sera supprimé (suppression logique) : il ne pourra plus se connecter.'"
+    confirmLabel="Supprimer"
+    cancelLabel="Annuler"
+    tone="danger"
+    (confirmed)="confirmDelete()"
+    (cancelled)="cancelDelete()" />
+}

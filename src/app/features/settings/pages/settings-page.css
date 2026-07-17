@@ -1,0 +1,56 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.settings-page {
+  padding: 24px 32px;
+  max-width: 640px;
+  user-select: text;
+}
+
+.settings-title {
+  margin: 0 0 20px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.settings-section-title {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--vscode-fg-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.settings-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 280px;
+}
+
+.settings-label {
+  font-size: 13px;
+}
+
+.settings-select {
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.settings-select:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.settings-hint {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--vscode-fg-dim);
+}

@@ -1,0 +1,33 @@
+<div class="welcome">
+  <div class="welcome-inner">
+    <h1 class="welcome-title">Desktop App</h1>
+    <p class="welcome-subtitle">Gestion d'entreprise — espace de travail multi-fenêtres</p>
+
+    <div class="welcome-columns">
+      <section class="welcome-section">
+        <h2>Démarrer</h2>
+        <ul class="welcome-links" role="list">
+          @for (starter of starters; track starter.type) {
+            <li>
+              <button type="button" class="welcome-link" (click)="open(starter)">
+                {{ starter.title }}
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+
+      <section class="welcome-section">
+        <h2>Raccourcis</h2>
+        <ul class="welcome-shortcuts" role="list">
+          @for (shortcut of shortcuts; track shortcut.keys) {
+            <li>
+              <span class="welcome-shortcut-label">{{ shortcut.label }}</span>
+              <kbd>{{ shortcut.keys }}</kbd>
+            </li>
+          }
+        </ul>
+      </section>
+    </div>
+  </div>
+</div>

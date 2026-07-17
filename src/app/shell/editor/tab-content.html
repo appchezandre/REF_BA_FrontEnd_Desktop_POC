@@ -1,0 +1,44 @@
+@switch (tab().type) {
+  @case ('welcome') {
+    <app-welcome-view />
+  }
+  @case ('order-list') {
+    @defer (on immediate) {
+      <app-orders-page [tab]="tab()" />
+    } @placeholder {
+      <div class="placeholder">Chargement…</div>
+    }
+  }
+  @case ('user-list') {
+    @defer (on immediate) {
+      <app-users-page [tab]="tab()" />
+    } @placeholder {
+      <div class="placeholder">Chargement…</div>
+    }
+  }
+  @case ('settings') {
+    @defer (on immediate) {
+      <app-settings-page />
+    } @placeholder {
+      <div class="placeholder">Chargement…</div>
+    }
+  }
+  @default {
+    <div class="placeholder">
+      <h2 class="placeholder-title">{{ tab().title }}</h2>
+      <p class="placeholder-meta">
+        Type d'écran : <code>{{ tab().type }}</code>
+        @if (tab().entityId) {
+          — entité <code>{{ tab().entityId }}</code>
+        }
+      </p>
+      <p class="placeholder-text">
+        Cet écran métier sera implémenté dans une feature dédiée
+        (<code>src/app/features/…</code>).
+      </p>
+      <button type="button" class="placeholder-button" (click)="toggleDirty()">
+        {{ tab().dirty ? 'Annuler la modification' : 'Simuler une modification' }}
+      </button>
+    </div>
+  }
+}

@@ -1,0 +1,52 @@
+<div class="shell">
+  <app-title-bar [sidebarVisible]="sidebarVisible()" [panelVisible]="panelVisible()"
+                 (toggleSidebar)="toggleSidebar()" (togglePanel)="togglePanel()" />
+
+  <div class="shell-body">
+    <app-activity-bar [active]="activeActivity()" [sidebarVisible]="sidebarVisible()"
+                      (selected)="onActivitySelected($event)" />
+    @if (sidebarVisible()) {
+      <app-side-bar class="shell-sidebar" [view]="activeActivity()"
+                    [style.width.px]="sidebarWidth()" />
+      <div class="sidebar-resize-handle" role="separator" aria-orientation="vertical"
+           tabindex="0" aria-label="Redimensionner le panneau latéral"
+           (pointerdown)="onSidebarResizeStart($event)"
+           (keydown)="onSidebarResizeKeydown($event)"></div>
+    }
+    <div class="shell-main">
+      <app-editor-area class="shell-editor" />
+      @if (panelVisible()) {
+        <div class="panel-resize-handle" role="separator" aria-orientation="horizontal"
+             tabindex="0" aria-label="Redimensionner le panneau inférieur"
+             (pointerdown)="onPanelResizeStart($event)"
+             (keydown)="onPanelResizeKeydown($event)"></div>
+        <app-panel class="shell-panel" [style.height.px]="panelHeight()"
+                   (closed)="panelVisible.set(false)" />
+      }
+    </div>
+  </div>
+
+  <app-status-bar />
+</div>
+
+@if (closeGuard.pendingTab(); as tab) {
+  <app-confirm-dialog
+    title="Fermer sans enregistrer ?"
+    [message]="'L’onglet « ' + tab.title + ' » a des modifications non enregistrées. Si vous le fermez, elles seront perdues.'"
+    confirmLabel="Fermer sans enregistrer"
+    cancelLabel="Annuler"
+    tone="danger"
+    (confirmed)="closeGuard.confirmClose()"
+    (cancelled)="closeGuard.cancelClose()" />
+}
+
+@if (windowClose.pending()) {
+  <app-confirm-dialog
+    title="Quitter sans enregistrer ?"
+    message="Des modifications ne sont pas enregistrées. Si vous quittez maintenant, elles seront perdues."
+    confirmLabel="Quitter sans enregistrer"
+    cancelLabel="Annuler"
+    tone="danger"
+    (confirmed)="windowClose.confirmExit()"
+    (cancelled)="windowClose.cancelExit()" />
+}

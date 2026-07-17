@@ -1,0 +1,49 @@
+<div class="orders-page">
+  <div class="screen-tabs" role="tablist" aria-label="Vues de la fenêtre Commandes">
+    <button type="button" class="screen-tab" role="tab"
+            [class.active]="screen().activeView() === LIST_VIEW"
+            [attr.aria-selected]="screen().activeView() === LIST_VIEW"
+            (click)="screen().activateList()">
+      Liste
+    </button>
+
+    @for (orderNumber of screen().detailNumbers(); track orderNumber) {
+      <div class="screen-tab screen-tab-detail" role="tab" tabindex="0"
+           [class.active]="screen().activeView() === orderNumber"
+           [attr.aria-selected]="screen().activeView() === orderNumber"
+           (click)="screen().activateDetail(orderNumber)"
+           (keydown.enter)="screen().activateDetail(orderNumber)">
+        <span>Détail — {{ orderNumber }}</span>
+        @if (screen().dirtyNumbers().has(orderNumber)) {
+          <span class="screen-tab-dirty" aria-label="Modifications non enregistrées">●</span>
+        }
+        <button type="button" class="screen-tab-close" tabindex="-1"
+                [attr.aria-label]="'Fermer le détail ' + orderNumber"
+                (click)="closeDetail($event, orderNumber)">
+          <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+            <path d="M0 0l8 8M8 0L0 8" stroke="currentColor" />
+          </svg>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="screen-body" role="tabpanel">
+    @if (screen().activeView() === LIST_VIEW) {
+      <app-order-list [screen]="screen()" />
+    } @else {
+      <app-order-detail [screen]="screen()" [orderNumber]="screen().activeView()" />
+    }
+  </div>
+</div>
+
+@if (pendingClose(); as orderNumber) {
+  <app-confirm-dialog
+    title="Fermer sans enregistrer ?"
+    [message]="'La commande ' + orderNumber + ' a des modifications non enregistrées. Si vous fermez cette fiche, elles seront perdues.'"
+    confirmLabel="Fermer sans enregistrer"
+    cancelLabel="Continuer l'édition"
+    tone="danger"
+    (confirmed)="confirmClose()"
+    (cancelled)="cancelClose()" />
+}

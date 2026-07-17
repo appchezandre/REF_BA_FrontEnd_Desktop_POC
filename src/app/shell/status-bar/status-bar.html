@@ -1,0 +1,17 @@
+<footer class="status-bar" role="status" [class.detached]="isDetached()">
+  <div class="status-side">
+    <span class="status-item">{{ modeLabel() }}</span>
+    <span class="status-item">{{ runtimeLabel() }}</span>
+  </div>
+  <div class="status-side">
+    <span class="status-item">{{ store.totalTabCount() }} onglet(s)</span>
+    <span class="status-item">{{ store.groups().length }} groupe(s)</span>
+    @if (userLabel(); as user) {
+      <span class="status-item">{{ user }}</span>
+      <button type="button" class="status-item status-button" (click)="logout()"
+              title="Se déconnecter (toutes les fenêtres)">
+        Se déconnecter
+      </button>
+    }
+  </div>
+</footer>

@@ -1,0 +1,47 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.placeholder {
+  padding: 32px;
+  user-select: text;
+}
+
+.placeholder-title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  font-weight: 400;
+}
+
+.placeholder-meta {
+  margin: 0 0 16px;
+  color: var(--vscode-fg-dim);
+}
+
+.placeholder-text {
+  margin: 0 0 20px;
+  color: var(--vscode-fg-dim);
+  max-width: 60ch;
+}
+
+code {
+  background: rgba(128, 128, 128, 0.17);
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.placeholder-button {
+  padding: 6px 14px;
+  border: none;
+  border-radius: 2px;
+  background: var(--vscode-accent);
+  color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.placeholder-button:hover {
+  background: var(--vscode-accent-hover);
+}

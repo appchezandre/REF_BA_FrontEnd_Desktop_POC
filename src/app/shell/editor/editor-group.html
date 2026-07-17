@@ -1,0 +1,135 @@
+<section class="editor-group" [class.focused]="isActiveGroup()"
+         [attr.data-dock-group]="group().id">
+  <div class="tab-strip-row">
+    @if (canScrollLeft()) {
+      <button type="button" class="tab-scroll" aria-label="Défiler les onglets vers la gauche"
+              title="Onglets précédents" (click)="scrollTabs(-1)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             aria-hidden="true">
+          <path d="M10 3.5L5.5 8l4.5 4.5" />
+        </svg>
+      </button>
+    }
+    <div #tabStrip class="tab-strip" role="tablist" aria-label="Onglets ouverts"
+         cdkDropList
+         cdkDropListOrientation="horizontal"
+         [cdkDropListData]="group().id"
+         (cdkDropListDropped)="onDrop($event)"
+         (scroll)="updateScrollState()">
+      @for (tab of group().tabs; track tab.id) {
+        <div class="tab"
+             cdkDrag
+             [cdkDragData]="tab.id"
+             (cdkDragStarted)="onDragStarted(tab)"
+             (cdkDragMoved)="onDragMoved($event)"
+             (cdkDragEnded)="onDragEnded()"
+             role="tab"
+             [id]="'tab-' + tab.id"
+             [class.active]="tab.id === group().activeTabId"
+             [class.pending]="store.pendingDetachIds().has(tab.id)"
+             [attr.aria-selected]="tab.id === group().activeTabId"
+             [tabindex]="tab.id === group().activeTabId ? 0 : -1"
+             (click)="onTabClick(tab)"
+             (keydown)="onTabKeydown($event, tab)">
+          <span class="tab-label">{{ tab.title }}</span>
+          @if (tab.dirty) {
+            <span class="tab-dirty" aria-label="Modifications non enregistrées">●</span>
+          }
+          <button type="button" class="tab-close" tabindex="-1"
+                  [attr.aria-label]="'Fermer ' + tab.title"
+                  (click)="closeTab($event, tab)"
+                  (mousedown)="$event.stopPropagation()">
+            <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+              <path d="M0 0l8 8M8 0L0 8" stroke="currentColor" />
+            </svg>
+          </button>
+        </div>
+      }
+    </div>
+
+    @if (canScrollRight()) {
+      <button type="button" class="tab-scroll" aria-label="Défiler les onglets vers la droite"
+              title="Onglets suivants" (click)="scrollTabs(1)">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+             aria-hidden="true">
+          <path d="M6 3.5L10.5 8L6 12.5" />
+        </svg>
+      </button>
+    }
+
+    <div class="tab-actions">
+      @if (activeTab() && electron.isElectron) {
+        <button type="button" class="tab-action"
+                aria-label="Détacher l'onglet actif dans une nouvelle fenêtre"
+                title="Détacher dans une nouvelle fenêtre (Ctrl+Alt+D)"
+                (click)="detachActive()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor"
+               aria-hidden="true">
+            <path d="M6.5 3.5h-4v9h9v-4" />
+            <path d="M9 2.5h4.5V7" />
+            <path d="M13.5 2.5L7.5 8.5" />
+          </svg>
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="editor-content" role="tabpanel" [attr.aria-labelledby]="panelLabelledBy()">
+    @if (activeTab(); as tab) {
+      <app-tab-content [tab]="tab" />
+    } @else {
+      <div class="editor-empty">
+        <svg width="120" height="120" viewBox="0 0 16 16" aria-hidden="true" class="editor-empty-mark">
+          <rect x="1" y="1" width="14" height="14" rx="3" fill="currentColor" />
+          <path d="M4.5 8l2.5 2.5L11.5 5" fill="none" stroke="var(--vscode-editor-bg)"
+                stroke-width="1.6" />
+        </svg>
+        <ul class="editor-empty-hints" role="list">
+          <li><span>Ouvrir un écran</span><kbd>Explorateur</kbd></li>
+          <li><span>Onglet suivant</span><kbd>Ctrl+Tab</kbd></li>
+          <li><span>Diviser</span><kbd>Glisser un onglet</kbd></li>
+          <li><span>Panneau latéral</span><kbd>Ctrl+B</kbd></li>
+          <li><span>Panneau inférieur</span><kbd>Ctrl+ù</kbd></li>
+        </ul>
+      </div>
+    }
+  </div>
+
+  @if (dockTarget(); as dock) {
+    <div class="dock-overlay" aria-hidden="true">
+      <div class="dock-preview" [class]="'zone-' + dock.zone"></div>
+      <div class="dock-guides">
+        <span class="dock-guide guide-top" [class.active]="dock.zone === 'top'">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+            <rect x="2.5" y="3.5" width="11" height="4" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="dock-guide guide-left" [class.active]="dock.zone === 'left'">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+            <rect x="2.5" y="3.5" width="4" height="9" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="dock-guide guide-center" [class.active]="dock.zone === 'center'">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+            <path d="M1.5 5.5h13" stroke="currentColor" />
+          </svg>
+        </span>
+        <span class="dock-guide guide-right" [class.active]="dock.zone === 'right'">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+            <rect x="9.5" y="3.5" width="4" height="9" fill="currentColor" />
+          </svg>
+        </span>
+        <span class="dock-guide guide-bottom" [class.active]="dock.zone === 'bottom'">
+          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+            <rect x="2.5" y="8.5" width="11" height="4" fill="currentColor" />
+          </svg>
+        </span>
+      </div>
+    </div>
+  }
+</section>

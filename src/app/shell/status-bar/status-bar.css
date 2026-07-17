@@ -1,0 +1,40 @@
+.status-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 22px;
+  padding: 0 6px;
+  background: var(--vscode-statusbar-bg);
+  color: #ffffff;
+  font-size: 12px;
+}
+
+.status-bar.detached {
+  background: var(--vscode-statusbar-detached-bg);
+}
+
+.status-side {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 8px;
+  white-space: nowrap;
+}
+
+.status-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.status-button {
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}

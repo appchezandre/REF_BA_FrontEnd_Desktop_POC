@@ -1,10 +1,17 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="utf-8">
-  <title>DesktopApp</title>
+  <title>Desktop App</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- CSP restrictive : 'unsafe-inline' (styles) requis par Angular ;
+       ws://localhost:4200 requis par le HMR de ng serve, inerte en prod.
+       connect-src doit lister les origines de l'API Ref.Api (dev :
+       http://localhost:5064 et https://localhost:3000) — ajouter l'URL de
+       l'API déployée au moment du packaging. -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://localhost:4200 ws://localhost:4200 http://localhost:5064 https://localhost:3000; object-src 'none'; base-uri 'self'">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>

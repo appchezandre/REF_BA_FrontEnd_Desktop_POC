@@ -1,0 +1,49 @@
+<div class="users-page">
+  <div class="screen-tabs" role="tablist" aria-label="Vues de la fenêtre Utilisateurs">
+    <button type="button" class="screen-tab" role="tab"
+            [class.active]="screen().activeView() === LIST_VIEW"
+            [attr.aria-selected]="screen().activeView() === LIST_VIEW"
+            (click)="screen().activateList()">
+      Liste
+    </button>
+
+    @for (key of screen().detailKeys(); track key) {
+      <div class="screen-tab screen-tab-detail" role="tab" tabindex="0"
+           [class.active]="screen().activeView() === key"
+           [attr.aria-selected]="screen().activeView() === key"
+           (click)="screen().activateDetail(key)"
+           (keydown.enter)="screen().activateDetail(key)">
+        <span>{{ detailLabel(key) }}</span>
+        @if (screen().dirtyKeys().has(key)) {
+          <span class="screen-tab-dirty" aria-label="Modifications non enregistrées">●</span>
+        }
+        <button type="button" class="screen-tab-close" tabindex="-1"
+                [attr.aria-label]="'Fermer la fiche ' + detailLabel(key)"
+                (click)="closeDetail($event, key)">
+          <svg width="8" height="8" viewBox="0 0 8 8" aria-hidden="true">
+            <path d="M0 0l8 8M8 0L0 8" stroke="currentColor" />
+          </svg>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="screen-body" role="tabpanel">
+    @if (screen().activeView() === LIST_VIEW) {
+      <app-user-list [screen]="screen()" />
+    } @else {
+      <app-user-detail [screen]="screen()" [userKey]="screen().activeView()" />
+    }
+  </div>
+</div>
+
+@if (pendingClose(); as key) {
+  <app-confirm-dialog
+    title="Fermer sans enregistrer ?"
+    [message]="'La fiche « ' + detailLabel(key) + ' » a des modifications non enregistrées. Si vous fermez cette fiche, elles seront perdues.'"
+    confirmLabel="Fermer sans enregistrer"
+    cancelLabel="Continuer l'édition"
+    tone="danger"
+    (confirmed)="confirmClose()"
+    (cancelled)="cancelClose()" />
+}

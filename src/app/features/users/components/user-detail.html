@@ -1,0 +1,224 @@
+@if (user(); as u) {
+  <div class="user-detail">
+    <header class="user-detail-header">
+      <h2>{{ u.name }}</h2>
+      <span class="status" [class.status-deleted]="u.deleted" [class.status-active]="!u.deleted">
+        {{ statusLabel() }}
+      </span>
+      @if (editing()) {
+        <span class="user-detail-mode">Édition</span>
+        @if (dirty()) {
+          <span class="user-detail-dirty">Modifications non enregistrées</span>
+        }
+      } @else {
+        <span class="user-detail-mode readonly">Lecture seule</span>
+      }
+    </header>
+
+    @if (editing() && draft(); as d) {
+      <form class="user-detail-body" (submit)="onSubmit($event)">
+        <div class="user-detail-fields">
+          <label class="field">
+            <span class="field-label">Id (clé)</span>
+            <input type="text" [value]="u.id" disabled />
+          </label>
+          <label class="field">
+            <span class="field-label">E-mail (non modifiable)</span>
+            <input type="email" [value]="u.email" disabled />
+          </label>
+          <label class="field">
+            <span class="field-label">Nom</span>
+            <input type="text" [value]="d.name" required
+                   (input)="updateField('name', $event)" />
+          </label>
+          <label class="field">
+            <span class="field-label">Nouveau mot de passe (vide = inchangé)</span>
+            <input type="password" autocomplete="new-password" [value]="d.password"
+                   (input)="updateField('password', $event)" />
+          </label>
+        </div>
+
+        @if (saveError(); as error) {
+          <p class="detail-error" role="alert">{{ error }}</p>
+        }
+
+        <footer class="user-detail-actions">
+          <button type="submit" class="action-primary" [disabled]="!dirty() || saving()">
+            {{ saving() ? 'Enregistrement…' : 'Enregistrer' }}
+          </button>
+          <button type="button" class="action-secondary" (click)="cancel()">
+            Annuler
+          </button>
+        </footer>
+      </form>
+    } @else {
+      <div class="user-detail-body">
+        <dl class="user-detail-fields">
+          <div class="field">
+            <dt class="field-label">Id (clé)</dt>
+            <dd class="field-value mono">{{ u.id }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">E-mail</dt>
+            <dd class="field-value mono">{{ u.email }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Nom</dt>
+            <dd class="field-value">{{ u.name }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Statut</dt>
+            <dd class="field-value">{{ statusLabel() }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Créé le</dt>
+            <dd class="field-value">{{ formatDateTime(u.createdAt) }}</dd>
+          </div>
+          <div class="field">
+            <dt class="field-label">Modifié le</dt>
+            <dd class="field-value">{{ formatDateTime(u.updatedAt) }}</dd>
+          </div>
+        </dl>
+
+        <footer class="user-detail-actions">
+          <button type="button" class="action-primary" [disabled]="isDeleted()"
+                  (click)="beginEdit()">
+            Modifier
+          </button>
+        </footer>
+      </div>
+    }
+
+    <section class="access" aria-labelledby="access-title">
+      <header class="access-header">
+        <h3 id="access-title">Rôles et permissions</h3>
+        <button type="button" class="action-secondary" [disabled]="isDeleted()"
+                (click)="toggleManageAccess()">
+          {{ manageAccess() ? 'Terminer la gestion' : 'Gérer les accès' }}
+        </button>
+      </header>
+
+      @if (accessLoading()) {
+        <p class="access-hint">Chargement des accès…</p>
+      } @else if (accessError(); as error) {
+        <p class="detail-error" role="alert">{{ error }}</p>
+      } @else if (access(); as a) {
+        @if (accessActionError(); as error) {
+          <p class="detail-error" role="alert">{{ error }}</p>
+        }
+
+        <h4 class="access-subtitle">Profils (rôles)</h4>
+        @if (a.roles.length) {
+          <ul class="role-list" role="list">
+            @for (role of a.roles; track role.id) {
+              <li class="role-item">
+                <div class="role-item-head">
+                  <span class="role-name">{{ role.name }}</span>
+                  @if (role.description) {
+                    <span class="role-desc">{{ role.description }}</span>
+                  }
+                  @if (manageAccess()) {
+                    <button type="button" class="chip-remove" [disabled]="accessBusy()"
+                            [attr.aria-label]="'Retirer le profil ' + role.name"
+                            title="Retirer ce profil" (click)="removeRole(role.id)">✕</button>
+                  }
+                </div>
+                <div class="chip-row">
+                  @for (code of role.permissions; track code) {
+                    <span class="chip">{{ code }}</span>
+                  } @empty {
+                    <span class="access-hint">Aucune permission dans ce profil.</span>
+                  }
+                </div>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="access-hint">Aucun profil affecté.</p>
+        }
+
+        @if (manageAccess()) {
+          @if (rolesCatalogError(); as error) {
+            <p class="access-hint">{{ error }}</p>
+          } @else if (rolesCatalog()) {
+            <div class="access-add">
+              <select aria-label="Profil à affecter" (change)="onRoleSelect($event)">
+                <option value="">— Choisir un profil —</option>
+                @for (role of assignableRoles(); track role.id) {
+                  <option [value]="role.id" [selected]="selectedRoleId() === role.id">
+                    {{ role.name }}
+                  </option>
+                }
+              </select>
+              <button type="button" class="action-secondary"
+                      [disabled]="selectedRoleId() === null || accessBusy()"
+                      (click)="assignRole()">
+                Affecter le profil
+              </button>
+            </div>
+          }
+        }
+
+        <h4 class="access-subtitle">Permissions directes</h4>
+        <div class="chip-row">
+          @for (permission of a.directPermissions; track permission.id) {
+            <span class="chip chip-direct" [title]="permission.description">
+              {{ permission.code }}
+              @if (manageAccess()) {
+                <button type="button" class="chip-remove" [disabled]="accessBusy()"
+                        [attr.aria-label]="'Révoquer ' + permission.code"
+                        title="Révoquer cette permission"
+                        (click)="revokePermission(permission.id)">✕</button>
+              }
+            </span>
+          } @empty {
+            <span class="access-hint">Aucune permission directe.</span>
+          }
+        </div>
+
+        @if (manageAccess()) {
+          @if (permissionsCatalogError(); as error) {
+            <p class="access-hint">{{ error }}</p>
+          } @else if (permissionsCatalog()) {
+            <div class="access-add">
+              <select aria-label="Permission à accorder" (change)="onPermissionSelect($event)">
+                <option value="">— Choisir une permission —</option>
+                @for (permission of grantablePermissions(); track permission.id) {
+                  <option [value]="permission.id"
+                          [selected]="selectedPermissionId() === permission.id">
+                    {{ permission.code }}
+                  </option>
+                }
+              </select>
+              <button type="button" class="action-secondary"
+                      [disabled]="selectedPermissionId() === null || accessBusy()"
+                      (click)="grantPermission()">
+                Accorder la permission
+              </button>
+            </div>
+          }
+        }
+
+        <h4 class="access-subtitle">
+          Permissions effectives
+          <span class="access-count">({{ a.effectivePermissions.length }})</span>
+        </h4>
+        <div class="chip-row">
+          @for (code of a.effectivePermissions; track code) {
+            <span class="chip chip-effective">{{ code }}</span>
+          } @empty {
+            <span class="access-hint">Aucune permission effective.</span>
+          }
+        </div>
+      }
+    </section>
+  </div>
+} @else {
+  <p class="user-detail-missing">
+    @if (usersLoading()) {
+      Chargement de l'utilisateur…
+    } @else {
+      L'utilisateur {{ userKey() }} est introuvable.
+    }
+  </p>
+}
