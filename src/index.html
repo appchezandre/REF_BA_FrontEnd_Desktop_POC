@@ -9,9 +9,12 @@
        ws://localhost:4200 requis par le HMR de ng serve, inerte en prod.
        connect-src doit lister les origines de l'API Ref.Api (dev :
        http://localhost:5064 et https://localhost:3000) — ajouter l'URL de
-       l'API déployée au moment du packaging. -->
+       l'API déployée au moment du packaging, en incluant son origine
+       WebSocket (wss://) pour le hub SignalR de maintenance.
+       ws://localhost:5064 : transport WebSocket du hub /hubs/maintenance ;
+       sans lui SignalR se rabat sur SSE/long-polling (dégradation, pas panne). -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://localhost:4200 ws://localhost:4200 http://localhost:5064 https://localhost:3000; object-src 'none'; base-uri 'self'">
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self' http://localhost:4200 ws://localhost:4200 http://localhost:5064 ws://localhost:5064 https://localhost:3000; object-src 'none'; base-uri 'self'">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
 </head>
 <body>

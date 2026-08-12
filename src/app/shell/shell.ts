@@ -6,6 +6,7 @@ import {
   signal
 } from '@angular/core';
 import { ElectronService } from '../core/electron/electron.service';
+import { MaintenanceService } from '../core/maintenance/maintenance.service';
 import { ShellUiService, ActivityView } from '../core/shell/shell-ui.service';
 import { ThemeService } from '../core/theme/theme.service';
 import { TabDetachService } from '../core/workspace/tab-detach.service';
@@ -53,6 +54,7 @@ export class Shell {
   private readonly detachService = inject(TabDetachService);
   // Instancié dès le boot pour appliquer le thème enregistré.
   private readonly theme = inject(ThemeService);
+  private readonly maintenance = inject(MaintenanceService);
 
   // Visibilité et vue de la side bar : portées par ShellUiService pour être
   // pilotables depuis des composants profonds (bouton Rechercher de la table).
@@ -164,8 +166,17 @@ export class Shell {
   /**
    * Raccourcis globaux. En navigateur pur, Ctrl+W et Ctrl+Tab sont réservés
    * par Chrome : Ctrl+PageUp/PageDown servent d'alias (comme dans VSCode).
+   *
+   * Tous les raccourcis sont inertes une fois l'application **figée** : le
+   * voile bloque le pointeur, ce garde-fou couvre le clavier (l'écouteur est
+   * posé sur `document`, donc hors de la portée du piège de focus du voile).
+   * Pendant le sursis de maintenance, ils restent actifs : l'utilisateur doit
+   * pouvoir naviguer et enregistrer son travail.
    */
   protected onKeydown(event: KeyboardEvent): void {
+    if (this.maintenance.frozen()) {
+      return;
+    }
     const ctrl = event.ctrlKey || event.metaKey;
     if (!ctrl) {
       return;

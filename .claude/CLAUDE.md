@@ -37,6 +37,7 @@ Les sections suivantes décrivent la **cible** ; état réel du dépôt (juillet
 - shell Electron minimal à la racine : `electron/main.cjs` (une seule fenêtre, un seul canal IPC `app:get-version`) et `electron/preload.cjs` (expose `window.desktopAPI`) ;
 - tests unitaires : Vitest via le builder `@angular/build:unit-test` ;
 - packaging : Electron Builder installé et configuré (`npm run dist`, cible NSIS Windows, sortie `release/`) ;
+- temps réel : `@microsoft/signalr` installé, consommé par le mode maintenance (hub `/hubs/maintenance`, chargé en import dynamique pour rester hors du bundle initial) — cf. `docs/mode-maintenance.md` ;
 - pas encore installés : NgRx SignalStore, Dexie, Fluent UI, Angular Split, Playwright.
 
 ---

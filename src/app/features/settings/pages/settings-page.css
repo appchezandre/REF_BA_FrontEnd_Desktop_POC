@@ -54,3 +54,71 @@
   font-size: 12px;
   color: var(--vscode-fg-dim);
 }
+
+.settings-section + .settings-section {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--vscode-border);
+}
+
+.settings-field + .settings-field {
+  margin-top: 12px;
+}
+
+.settings-field-wide {
+  max-width: 100%;
+}
+
+.settings-input {
+  padding: 5px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.settings-warning {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-left: 3px solid var(--vscode-status-warning-border);
+  background: var(--vscode-hover-bg);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.settings-error {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--vscode-status-danger-fg);
+}
+
+.settings-actions {
+  margin-top: 16px;
+}
+
+.settings-button-danger {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 2px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  background: #c42b1c;
+  color: #ffffff;
+}
+
+.settings-button-danger:hover:not(:disabled) {
+  background: #a82418;
+}
+
+.settings-button-danger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

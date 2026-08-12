@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ElectronService } from '../../../core/electron/electron.service';
+import { MaintenanceService } from '../../../core/maintenance/maintenance.service';
 
 /**
  * Écran de connexion, affiché à la place du shell tant qu'aucune session
@@ -18,6 +19,7 @@ import { ElectronService } from '../../../core/electron/electron.service';
 export class LoginPage {
   protected readonly electron = inject(ElectronService);
   private readonly auth = inject(AuthService);
+  private readonly maintenance = inject(MaintenanceService);
   private readonly fb = inject(NonNullableFormBuilder);
 
   protected readonly form = this.fb.group({
@@ -29,7 +31,10 @@ export class LoginPage {
   protected readonly error = signal<string | null>(null);
 
   protected async onSubmit(): Promise<void> {
-    if (this.submitting()) {
+    // Aucune connexion pendant une maintenance. Le voile rendu par `App`
+    // recouvre déjà ce formulaire et l'intercepteur refuserait la requête :
+    // ce garde-fou rend la règle explicite là où elle s'applique.
+    if (this.submitting() || this.maintenance.underMaintenance()) {
       return;
     }
     if (this.form.invalid) {

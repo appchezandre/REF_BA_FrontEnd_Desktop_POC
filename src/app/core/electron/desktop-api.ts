@@ -34,6 +34,8 @@ export interface DesktopApi {
   readonly app: {
     getVersion(): Promise<string>;
     getPlatform(): Promise<string>;
+    /** Quitte l'application entière, à distinguer de `windows.close()`. */
+    quit(): Promise<void>;
   };
   readonly windows: {
     getContext(): Promise<WindowContext | null>;

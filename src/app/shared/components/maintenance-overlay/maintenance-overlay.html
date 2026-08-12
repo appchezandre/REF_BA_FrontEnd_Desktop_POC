@@ -1,0 +1,52 @@
+<div class="maintenance-backdrop">
+  <div #container class="maintenance-panel" role="alertdialog" aria-modal="true"
+       tabindex="-1" aria-live="assertive"
+       aria-labelledby="maintenance-title" aria-describedby="maintenance-message">
+    <div class="maintenance-icon" aria-hidden="true">⚠</div>
+
+    <h1 class="maintenance-title" id="maintenance-title">Application en maintenance</h1>
+
+    <p class="maintenance-message" id="maintenance-message">{{ message() }}</p>
+
+    @if (delayMinutes() > 0) {
+      <p class="maintenance-delay">
+        Durée estimée : {{ delayMinutes() }} minute{{ delayMinutes() > 1 ? 's' : '' }}.
+        @if (estimatedEnd(); as end) {
+          <span class="maintenance-end">Fin prévue : {{ end }}.</span>
+        }
+      </p>
+    }
+
+    @if (canLift()) {
+      <p class="maintenance-hint">
+        Vous avez déclenché cette maintenance : votre session est conservée pour
+        vous permettre de la lever. Aucune autre opération n’est possible d’ici là.
+      </p>
+    } @else {
+      <p class="maintenance-hint">
+        Votre session a été fermée et aucune opération n’est possible pendant la
+        maintenance. Vous pouvez fermer l’application ; sinon elle se débloquera
+        automatiquement dès la fin de l’intervention.
+      </p>
+    }
+
+    @if (error(); as errorMessage) {
+      <p class="maintenance-error" role="alert">{{ errorMessage }}</p>
+    }
+
+    <div class="maintenance-actions">
+      @if (canLift()) {
+        <button type="button" class="maintenance-button maintenance-button-primary"
+                [disabled]="lifting()" (click)="lift.emit()">
+          {{ lifting() ? 'Levée en cours…' : 'Lever la maintenance' }}
+        </button>
+      }
+      @if (canClose()) {
+        <button type="button" class="maintenance-button maintenance-button-close"
+                (click)="closed.emit()">
+          Fermer l’application
+        </button>
+      }
+    </div>
+  </div>
+</div>

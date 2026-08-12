@@ -263,8 +263,9 @@ interface WindowContext {
 | Canal | Sens | Rôle |
 |---|---|---|
 | `app:get-version` | invoke | Version de l'application |
+| `app:quit` | invoke | Quitte l'application entière (toutes les fenêtres), sans garde de modifications non enregistrées — utilisé par le voile de maintenance |
 | `window:get-context` | invoke | Contexte de la fenêtre appelante |
-| `window:minimize` / `window:close` | invoke | Contrôles natifs |
+| `window:minimize` / `window:close` | invoke | Contrôles natifs (`close` ne ferme que la fenêtre appelante) |
 | `window:toggle-maximize` / `window:is-maximized` | invoke | Agrandir/restaurer |
 | `window:detach-tab` | invoke | Crée une fenêtre détachée (payload sanitizé) |
 | `sync:publish` | invoke | Publie l'état d'un sujet sur le bus inter-fenêtres |
@@ -362,6 +363,19 @@ Côté renderer :
   chaque modification et applique les états reçus. Stratégie
   dernier-écrit-gagnant, en attendant que l'API backend devienne l'autorité
   (le bus véhiculera alors des invalidations plutôt que des états).
+
+Sujets utilisés à ce jour :
+
+| Sujet | Émetteur | Rôle |
+|---|---|---|
+| `auth/state` | `core/auth/auth.service.ts` | session : connexion et déconnexion propagées (cf. `docs/authentification.md`) |
+| `ui/theme` | `core/theme/theme.service.ts` | thème appliqué à toutes les fenêtres |
+| `maintenance/state` | `core/maintenance/maintenance.service.ts` | gel de l'interface ; aligne une fenêtre dont le hub SignalR a échoué (cf. `docs/mode-maintenance.md`) |
+| `orders/state` | `features/orders/data-access/orders.service.ts` | état complet des commandes |
+| `users/state` | `features/users/data-access/users.service.ts` | état complet des utilisateurs |
+
+Règle commune : un état **reçu** du bus n'est jamais republié (anti ping-pong),
+l'émetteur étant déjà exclu de sa propre rediffusion par Electron Main.
 
 ## 6. Layout du shell et panneaux
 

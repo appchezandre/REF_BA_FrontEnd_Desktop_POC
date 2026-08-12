@@ -18,4 +18,48 @@
       </span>
     </label>
   </section>
+
+  <section class="settings-section">
+    <h3 class="settings-section-title">Maintenance</h3>
+
+    <p class="settings-warning" role="note">
+      Passer l’application en maintenance avertit
+      <strong>tous les utilisateurs</strong> et leur laisse
+      <strong>deux minutes</strong> pour enregistrer leur travail ; à
+      l’échéance, leurs fenêtres sont figées et leurs sessions fermées.
+      <strong>Cette fenêtre-ci est figée immédiatement</strong> : enregistrez
+      avant de valider. Votre session reste ouverte et la maintenance se lève
+      depuis le voile qui s’affichera ici.
+    </p>
+
+    <label class="settings-field">
+      <span class="settings-label">Durée estimée (minutes)</span>
+      <input class="settings-input" type="number" min="1" step="1"
+             [value]="delayMinutes()" (input)="onDelayInput($event)" />
+    </label>
+
+    <label class="settings-field settings-field-wide">
+      <span class="settings-label">Message affiché aux utilisateurs</span>
+      <input class="settings-input" type="text" maxlength="300"
+             placeholder="Laisser vide pour le message par défaut du serveur"
+             [value]="customMessage()" (input)="onMessageInput($event)" />
+    </label>
+
+    @if (maintenanceError(); as error) {
+      <p class="settings-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="settings-actions">
+      <button type="button" class="settings-button-danger" [disabled]="starting()"
+              (click)="onStartMaintenance()">
+        {{ starting() ? 'Activation…' : 'Passer en maintenance' }}
+      </button>
+    </div>
+
+    <p class="settings-hint">
+      L’API réserve cette action aux porteurs de la permission
+      <code>Maintenance.Manage</code> ; sans elle, la demande est refusée
+      (cf. docs/mode-maintenance.md).
+    </p>
+  </section>
 </div>

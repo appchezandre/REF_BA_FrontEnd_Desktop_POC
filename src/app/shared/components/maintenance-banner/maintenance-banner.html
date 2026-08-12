@@ -1,0 +1,33 @@
+<!-- Couche d'accueil : centre le bandeau sans transformation CSS (le CDK pilote
+     `transform`) et laisse passer le pointeur partout ailleurs. -->
+<div class="maintenance-banner-layer">
+  <!-- `role="alert"` : annoncé une fois à l'apparition. Le décompte est
+       `aria-hidden` pour ne pas être relu chaque seconde par un lecteur
+       d'écran ; le texte annoncé porte déjà la consigne. -->
+  <div #banner class="maintenance-banner" role="alert"
+       cdkDrag cdkDragBoundary=".maintenance-banner-layer"
+       [cdkDragFreeDragPosition]="offset()"
+       (cdkDragEnded)="onDragEnded($event)">
+    <button type="button" class="maintenance-banner-handle"
+            aria-label="Déplacer le bandeau (flèches du clavier, Origine pour recentrer)"
+            (keydown)="onHandleKeydown($event)">
+      <span aria-hidden="true">⠿</span>
+    </button>
+
+    <span class="maintenance-banner-icon" aria-hidden="true">⚠</span>
+
+    <div class="maintenance-banner-text">
+      <strong class="maintenance-banner-title">
+        Maintenance imminente : enregistrez votre travail.
+      </strong>
+      @if (message()) {
+        <span class="maintenance-banner-message">{{ message() }}</span>
+      }
+    </div>
+
+    <div class="maintenance-banner-timer">
+      <span class="maintenance-banner-timer-label">Gel dans</span>
+      <span class="maintenance-banner-countdown" aria-hidden="true">{{ countdown() }}</span>
+    </div>
+  </div>
+</div>

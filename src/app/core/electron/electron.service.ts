@@ -58,6 +58,15 @@ export class ElectronService {
     await this.api?.windows.close();
   }
 
+  /**
+   * Quitte l'application entière (toutes les fenêtres). Inconditionnel : aucune
+   * garde de modifications non enregistrées, contrairement à
+   * `WindowCloseService.requestExit()`.
+   */
+  async quitApp(): Promise<void> {
+    await this.api?.app.quit();
+  }
+
   detachTab(request: DetachTabRequest): Promise<DetachTabResult> {
     if (!this.api) {
       return Promise.resolve({ ok: false, error: 'not-electron' });

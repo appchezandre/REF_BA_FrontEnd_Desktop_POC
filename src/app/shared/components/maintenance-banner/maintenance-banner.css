@@ -1,0 +1,105 @@
+/* Couche d'accueil : occupe la fenêtre pour centrer le bandeau et servir de
+   limite de glissement, mais reste transparente au pointeur — l'application
+   doit rester pleinement utilisable pendant le sursis.
+   z-index au-dessus des dialogues (1000) pour rester visible pendant une
+   confirmation, mais sous le voile de maintenance (2000) qui prend le relais. */
+.maintenance-banner-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  pointer-events: none;
+}
+
+.maintenance-banner {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  max-width: min(680px, 100%);
+  padding: 10px 16px;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-status-warning-border);
+  border-left: 3px solid var(--vscode-status-warning-fg);
+  border-radius: 4px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  color: var(--vscode-fg);
+  cursor: move;
+  /* Seul le bandeau intercepte le pointeur dans la couche. */
+  pointer-events: auto;
+  /* Empêche la fenêtre native d'accaparer le glisser si le bandeau est amené
+     au-dessus de la bande de titre. */
+  -webkit-app-region: no-drag;
+}
+
+/* Pendant le glisser : ombre accentuée, transition désactivée par le CDK. */
+.maintenance-banner.cdk-drag-dragging {
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.6);
+}
+
+.maintenance-banner-handle {
+  display: flex;
+  align-items: center;
+  padding: 0 2px;
+  border: none;
+  background: none;
+  color: var(--vscode-fg-dim);
+  font-size: 15px;
+  line-height: 1;
+  cursor: move;
+}
+
+.maintenance-banner-handle:hover {
+  color: var(--vscode-fg);
+}
+
+.maintenance-banner-handle:focus-visible {
+  outline: 1px solid var(--vscode-accent);
+  outline-offset: 2px;
+}
+
+.maintenance-banner-icon {
+  font-size: 20px;
+  line-height: 1;
+  color: var(--vscode-status-warning-fg);
+}
+
+.maintenance-banner-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.maintenance-banner-title {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.maintenance-banner-message {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--vscode-fg-dim);
+}
+
+.maintenance-banner-timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 14px;
+  border-left: 1px solid var(--vscode-border);
+}
+
+.maintenance-banner-timer-label {
+  font-size: 11px;
+  color: var(--vscode-fg-dim);
+}
+
+.maintenance-banner-countdown {
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--vscode-status-warning-fg);
+}

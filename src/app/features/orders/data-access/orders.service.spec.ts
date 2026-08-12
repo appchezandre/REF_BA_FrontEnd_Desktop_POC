@@ -24,7 +24,8 @@ function installDesktopApiMock(): DesktopApiMock {
     api: {
       app: {
         getVersion: () => Promise.resolve('0.0.0-test'),
-        getPlatform: () => Promise.resolve('win32')
+        getPlatform: () => Promise.resolve('win32'),
+        quit: () => Promise.resolve()
       },
       windows: {
         getContext: () => Promise.resolve(null),

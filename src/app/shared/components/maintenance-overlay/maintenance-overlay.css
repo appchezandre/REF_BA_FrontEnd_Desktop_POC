@@ -1,0 +1,117 @@
+/* z-index au-dessus de toute autre couche de l'application (ConfirmDialog est
+   à 1000) : le voile de maintenance ne doit jamais être recouvert. */
+.maintenance-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  -webkit-app-region: no-drag;
+}
+
+.maintenance-panel {
+  width: min(480px, 100%);
+  padding: 28px;
+  text-align: center;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-status-warning-border);
+  border-radius: 6px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
+  color: var(--vscode-fg);
+}
+
+.maintenance-panel:focus {
+  outline: none;
+}
+
+.maintenance-icon {
+  font-size: 32px;
+  line-height: 1;
+  color: var(--vscode-status-warning-fg);
+}
+
+.maintenance-title {
+  margin: 12px 0 10px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.maintenance-message {
+  margin: 0 0 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.maintenance-delay {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--vscode-status-warning-fg);
+}
+
+.maintenance-end {
+  display: block;
+  margin-top: 2px;
+}
+
+.maintenance-hint {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--vscode-fg-dim);
+}
+
+.maintenance-error {
+  margin: 16px 0 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--vscode-status-danger-fg);
+}
+
+.maintenance-actions {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.maintenance-button {
+  padding: 6px 16px;
+  border: none;
+  border-radius: 2px;
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--vscode-button-secondary-bg);
+  color: var(--vscode-fg);
+}
+
+.maintenance-button:hover:not(:disabled) {
+  background: var(--vscode-button-secondary-hover-bg);
+}
+
+.maintenance-button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.maintenance-button-primary {
+  background: var(--vscode-accent);
+  color: #ffffff;
+}
+
+.maintenance-button-primary:hover:not(:disabled) {
+  background: var(--vscode-accent-hover);
+}
+
+/* Fermer l'application est l'action par défaut quand c'est la seule offerte,
+   mais reste secondaire devant « Lever la maintenance ». */
+.maintenance-button-close:only-child {
+  background: var(--vscode-accent);
+  color: #ffffff;
+}
+
+.maintenance-button-close:only-child:hover {
+  background: var(--vscode-accent-hover);
+}

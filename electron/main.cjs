@@ -167,6 +167,12 @@ function broadcastSyncEvent(sourceEntry, topic, data) {
 function registerIpcHandlers() {
   ipcMain.handle('app:get-version', () => app.getVersion());
 
+  // Quitte l'application entière (toutes les fenêtres), à distinguer de
+  // `window:close`. Utilisé par le voile de maintenance : la fermeture y est
+  // volontairement inconditionnelle, sans garde de modifications non
+  // enregistrées (le sursis de maintenance a déjà laissé le temps d'enregistrer).
+  ipcMain.handle('app:quit', () => app.quit());
+
   ipcMain.handle('window:get-context', (event) => {
     const entry = getEntryByWebContents(event.sender);
     return entry ? entry.context : null;

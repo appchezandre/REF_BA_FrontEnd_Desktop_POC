@@ -63,6 +63,12 @@ core/api/problem-details.ts      parsing RFC 7807 -> message utilisateur
   login. Erreur réseau → session conservée.
 - **Déconnexion** : purge locale immédiate + publication, puis `revoke` du
   refresh token en meilleur effort. Bouton dans la status bar.
+- **Déconnexion forcée par la maintenance** : l'annonce d'une maintenance ouvre
+  un sursis de deux minutes (session conservée, `refresh` toujours autorisé pour
+  que les enregistrements aboutissent, mais `login` déjà refusé) ; à l'échéance
+  `MaintenanceService` appelle `logout()` et un voile bloquant recouvre l'écran
+  de connexion — plus aucune session ne peut être ouverte ni renouvelée, seul
+  `revoke` reste autorisé. Voir `docs/mode-maintenance.md`.
 
 ## Tests
 

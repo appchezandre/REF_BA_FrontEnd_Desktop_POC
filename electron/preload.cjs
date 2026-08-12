@@ -16,7 +16,8 @@ function subscribe(channel, listener) {
 contextBridge.exposeInMainWorld('desktopAPI', {
   app: {
     getVersion: () => ipcRenderer.invoke('app:get-version'),
-    getPlatform: () => Promise.resolve(process.platform)
+    getPlatform: () => Promise.resolve(process.platform),
+    quit: () => ipcRenderer.invoke('app:quit')
   },
   windows: {
     getContext: () => ipcRenderer.invoke('window:get-context'),
