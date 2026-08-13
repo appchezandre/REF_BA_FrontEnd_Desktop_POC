@@ -132,6 +132,54 @@ transport. Dérogation assumée au « RxJS pour le temps réel » du CLAUDE.md.
 
 ### Séquence
 
+Vue d'ensemble des deux flux, sur le cas le plus riche (déclenchement par
+l'opérateur depuis les Paramètres) :
+
+```mermaid
+%%{init: {'theme': 'neutral'}}%%
+sequenceDiagram
+    autonumber
+    participant OP as Fenêtre initiatrice
+    participant API as Ref.Api
+    participant HUB as Hub /hubs/maintenance
+    participant WB as Autre fenêtre
+
+    rect rgb(255, 255, 255)
+
+    rect rgb(255, 243, 205)
+    note over OP,WB: Mise en maintenance
+    OP->>OP: initiatedLocally = true
+    OP->>API: POST /api/Maintenance/start (Bearer Maintenance.Manage)
+    API->>HUB: MaintenanceStateChanged(isUnderMaintenance = true)
+    HUB-->>OP: notification (peut devancer la réponse HTTP)
+    HUB-->>WB: notification
+    API-->>OP: 200 MaintenanceNotification
+    note over OP: frozen immédiat, sans sursis<br/>session CONSERVÉE<br/>voile « Lever la maintenance »
+    OP->>WB: bus maintenance/state (via Electron Main) : grace + graceDeadlineMs
+    note over WB: grace (2 min)<br/>bandeau + décompte, travail possible<br/>seul le login est refusé
+    WB->>WB: échéance graceDeadlineMs atteinte
+    note over WB: frozen<br/>logout() puis voile « Fermer l'application »<br/>tout refusé sauf plan de contrôle et revoke
+    end
+
+    rect rgb(214, 236, 214)
+    note over OP,WB: Sortie de maintenance
+    OP->>API: POST /api/Maintenance/stop (depuis le voile)
+    API->>HUB: MaintenanceStateChanged(isUnderMaintenance = false)
+    HUB-->>OP: notification
+    HUB-->>WB: notification
+    API-->>OP: 200 MaintenanceNotification
+    note over OP,WB: operational : voile et bandeau levés partout,<br/>connexion à nouveau possible
+    end
+
+    end
+```
+
+Variante : si la maintenance est déclenchée par un **tiers** (Swagger, script
+d'exploitation), aucune fenêtre n'est initiatrice — toutes suivent le chemin de
+la « fenêtre B » (sursis puis gel et déconnexion), et la sortie ne peut venir
+que du tiers. Si le hub d'une fenêtre est coupé, le sondage `GET` ou le bus
+inter-fenêtres la rattrape (cf. « Transport et repli »).
+
 À l'annonce (transition vers `grace`) :
 
 1. la phase et l'échéance sont posées → **le bandeau apparaît**, l'application
