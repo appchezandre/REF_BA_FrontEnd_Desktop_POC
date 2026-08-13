@@ -1,6 +1,6 @@
 # Système de fenêtrage — document de référence
 
-> État : juillet 2026. Décrit le système tel qu'implémenté (shell type VSCode,
+> État : août 2026. Décrit le système tel qu'implémenté (shell type VSCode,
 > multi-fenêtres Electron). Les évolutions prévues sont listées en fin de
 > document.
 
@@ -212,7 +212,7 @@ distinctes. Les autres types d'onglet conservent le placeholder générique.
 
 Store `providedIn: 'root'` à base de **signals**, un par fenêtre (les signals
 ne sont jamais partagés entre fenêtres). Il est **pur** (aucun IPC) et
-entièrement testé (`workspace-store.spec.ts`, 51 tests).
+entièrement testé (`workspace-store.spec.ts`, 55 tests).
 
 L'état central est le signal `layout` (l'arbre `WorkspaceLayout`) ; le
 computed `groups` expose les feuilles de gauche à droite (parcours en
@@ -233,6 +233,7 @@ par une méthode du store.
 | `forceRemoveTab(id)` | Idem sans condition (fin de détachement) |
 | `moveTab` / `transferTab` | Réordonnancement / transfert inter-groupes (indices bornés) ; l'onglet transféré devient actif dans la cible et le focus suit |
 | `splitActiveGroup(direction)` | Remplace la feuille du groupe actif par un nœud split (ratio 0.5) dont le second enfant contient un duplicata de l'onglet actif (**nouvel id**, même type/entité). Plus de bouton ni de raccourci : la division se fait par docking (§7) ; la méthode reste l'API programmatique du store |
+| `dockTab(tabId, groupId, zone)` | Traduction d'un drop sur les guides (§7). `center` : transfert en fin du groupe cible — **no-op si la cible est le groupe source** (l'onglet garde sa position, comme VS Code). Bords : retire l'onglet de sa source (élaguée si vidée) puis divise la cible du côté choisi ; **no-op** pour l'unique onglet d'un groupe sur son propre bord (l'UI masque alors les pastilles de bord) |
 | `resizeSplit(splitId, ratio)` | Ajuste le ratio d'un nœud split (poignée) ; borné à [0.1, 0.9], rejette NaN |
 | Groupe vidé | Retiré de l'arbre : son nœud split parent est remplacé par le **frère, qui occupe alors tout l'espace** (simplification de l'arbre). Le dernier groupe est conservé vide (filigrane + raccourcis) |
 | `initializeForContext(ctx)` | Applique le contexte fenêtre au démarrage ; en mode `detached-tab`, **revalide** `initialTab` (donnée IPC non fiable) et retombe sur l'accueil si invalide ; idempotent |
@@ -537,7 +538,7 @@ Trois issues possibles selon l'endroit où l'onglet est relâché :
 | Zone de drop | Résultat |
 |---|---|
 | Une **bande d'onglets** (la sienne ou celle d'un autre groupe) | Réordonnancement / transfert à l'index visé (CDK) |
-| Le **corps d'un groupe** — guides de dock | `center` : ajout comme onglet du groupe ; `left`/`right` : split horizontal ; `top`/`bottom` : split vertical (le nouveau groupe est placé du côté choisi) |
+| Le **corps d'un groupe** — guides de dock | `center` : ajout comme onglet du groupe (no-op sur son propre groupe : l'onglet garde sa position) ; `left`/`right` : split horizontal ; `top`/`bottom` : split vertical (le nouveau groupe est placé du côté choisi) |
 | **Aucune destination** (panneau inférieur, side bar, hors fenêtre…) | **Détachement** dans une nouvelle fenêtre native (Electron ; en navigateur pur, l'onglet revient à sa place) |
 
 Le panneau inférieur n'est jamais une cible de dock.
@@ -550,12 +551,24 @@ gauche, droite, haut, bas) et un **aperçu translucide** de la zone
 résultante. La zone est choisie soit en survolant une pastille, soit par
 proximité des bords (bandes de 20 %), sinon centre.
 
+Cas particulier : quand l'onglet glissé est l'**unique onglet** de son groupe
+et survole **son propre groupe**, un split serait un no-op (`dockTab`
+l'ignore). Pour ne pas afficher une affordance mensongère, seules la pastille
+centre et l'aperçu pleine page s'affichent (`DockTarget.edgeGuides: false`)
+et la zone est **dégradée vers `center`** — jamais `null`, sinon le drop
+tomberait dans la branche de détachement Electron.
+
 Mécanique (`shell/editor/tab-drag.service.ts`) :
 
-- les événements CDK (`cdkDragStarted/Moved/Ended`) alimentent le service,
-  qui résout la cible par `document.elementFromPoint` → ancêtre
+- les événements CDK (`cdkDragStarted/Moved/Ended`) alimentent le service
+  (`start` reçoit l'onglet, son groupe source et s'il est l'unique onglet du
+  groupe), qui résout la cible par `document.elementFromPoint` → ancêtre
   `[data-dock-group]` (l'aperçu CDK et l'overlay sont en
   `pointer-events: none`) ;
+- au-dessus d'une **poignée de redimensionnement** (`.split-handle`,
+  `.panel-resize-handle`, `.sidebar-resize-handle` — bandes de 2-4 px qui
+  recouvrent les bords des groupes), la cible précédente est **conservée**
+  le temps de la traversée, au lieu d'être perdue ;
 - au-dessus d'une bande d'onglets, la cible de dock est annulée (le CDK gère
   l'insertion) ;
 - au drop (`cdkDropListDropped` avec `isPointerOverContainer: false`), le
@@ -565,7 +578,9 @@ Mécanique (`shell/editor/tab-drag.service.ts`) :
   `cdkDragEnded` est émis avant `cdkDropListDropped`, qui lit encore la
   cible ;
 - la géométrie du hit-test des pastilles (40 px, offset 44 px) est alignée
-  sur la grille CSS `.dock-guides` de `editor-group.css`.
+  sur la grille CSS `.dock-guides` de `editor-group.css` ; `computeZone` est
+  une fonction pure exportée, testée exhaustivement
+  (`tab-drag.service.spec.ts`).
 
 Conventions CDK conservées :
 
@@ -575,6 +590,29 @@ Conventions CDK conservées :
 - l'aperçu de drag est cloné sur `<body>` : styles **globaux**
   (`styles.css`, classes `.cdk-drag-*`) ;
 - le bouton × d'un onglet stoppe `mousedown` pour ne pas démarrer un drag.
+
+### ⚠️ Isolation des `cdkDropList` des écrans métier
+
+`CdkDropList` hérite du `CDK_DROP_LIST_GROUP` par **injecteur d'élément**
+(`inject(…, { optional: true, skipSelf: true })`), qui traverse les
+frontières de composants. Sans précaution, tout `cdkDropList` rendu dans un
+écran métier (ex. réordonnancement de colonnes des listes Utilisateurs /
+Commandes) rejoint silencieusement le `cdkDropListGroup` de l'éditeur : un
+onglet glissé qui traverse la ligne d'en-tête du tableau est **capturé** par
+elle (le CDK ne rend l'item au conteneur initial que si le pointeur le
+survole à nouveau) → le drop déclenche le réordonnancement de colonnes au
+lieu du dock, sans aucun retour visuel en navigateur.
+
+Deux protections en place :
+
+- `TabContent` fournit `{ provide: CDK_DROP_LIST_GROUP, useValue: null }` :
+  tout le contenu métier (actuel et futur) est coupé du groupe de l'éditeur,
+  dans les deux sens ;
+- la bande d'onglets porte un `cdkDropListEnterPredicate` défensif qui
+  n'accepte que les drags dont `data` est un id d'onglet connu du store.
+
+Si un `cdkDropList` est un jour rendu sous `.editor-area` **hors** de
+`TabContent`, lui appliquer la même coupure.
 
 ## 8. Raccourcis clavier
 
@@ -619,7 +657,7 @@ Sans Electron (`npm start` seul), `window.desktopAPI` est absent :
 ```bash
 npm run electron:dev    # dev : ng serve + Electron (rechargement)
 npm run build && npm run electron   # prod
-npm test                # 140 tests Vitest (store, layout, sync, gardes, menus, feature Commandes)
+npm test                # 378 tests Vitest (store, layout, dock, sync, gardes, menus, features)
 ```
 
 ## 12. Limites actuelles / feuille de route

@@ -83,31 +83,33 @@ describe('mapAuthResponseToSession', () => {
 });
 
 describe('parseSyncedAuthState', () => {
-  it('accepte une déconnexion explicite', () => {
-    expect(parseSyncedAuthState({ authenticated: false })).toEqual({ authenticated: false });
+  it('accepte une pile vide (déconnexion explicite)', () => {
+    expect(parseSyncedAuthState({ sessions: [] })).toEqual({ sessions: [] });
   });
 
-  it('accepte une session valide', () => {
-    const session = makeSession();
-    expect(parseSyncedAuthState({ authenticated: true, session })).toEqual({
-      authenticated: true,
-      session
+  it('accepte une pile de sessions valides', () => {
+    const first = makeSession();
+    const second = { ...makeSession(), refreshToken: 'refresh-2' };
+    expect(parseSyncedAuthState({ sessions: [first, second] })).toEqual({
+      sessions: [first, second]
     });
   });
 
   it('rejette les payloads hostiles ou incomplets', () => {
     expect(parseSyncedAuthState(null)).toBeNull();
     expect(parseSyncedAuthState('texte')).toBeNull();
-    expect(parseSyncedAuthState({ authenticated: 'oui' })).toBeNull();
-    expect(parseSyncedAuthState({ authenticated: true })).toBeNull();
-    expect(
-      parseSyncedAuthState({ authenticated: true, session: { accessToken: '' } })
-    ).toBeNull();
+    expect(parseSyncedAuthState({})).toBeNull();
+    expect(parseSyncedAuthState({ sessions: 'pas-un-tableau' })).toBeNull();
     expect(
       parseSyncedAuthState({
-        authenticated: true,
-        session: { ...makeSession(), user: { id: 1, email: 2, displayName: 3 } }
+        sessions: [{ ...makeSession(), user: { id: 1, email: 2, displayName: 3 } }]
       })
+    ).toBeNull();
+  });
+
+  it('rejette la pile entière si une seule entrée est invalide', () => {
+    expect(
+      parseSyncedAuthState({ sessions: [makeSession(), { accessToken: '' }] })
     ).toBeNull();
   });
 });

@@ -73,13 +73,18 @@ describe('authInterceptor', () => {
   let httpClient: HttpClient;
   let auth: AuthService;
 
-  /** Injecte une session dans AuthService via le bus (comme une autre fenêtre). */
-  function seedSession(accessToken: string, refreshToken: string): void {
+  /** Injecte une pile de sessions dans AuthService via le bus (comme une
+   *  autre fenêtre) ; la dernière entrée est la session active. */
+  function seedStack(sessions: readonly AuthSession[]): void {
     mock.emitSyncEvent({
       topic: 'auth/state',
-      data: { authenticated: true, session: makeSession(accessToken, refreshToken) },
+      data: { sessions },
       sourceWindowId: 'win-b'
     });
+  }
+
+  function seedSession(accessToken: string, refreshToken: string): void {
+    seedStack([makeSession(accessToken, refreshToken)]);
   }
 
   beforeEach(() => {
@@ -181,5 +186,35 @@ describe('authInterceptor', () => {
 
     await expect(resultPromise).rejects.toMatchObject({ status: 401 });
     expect(auth.isAuthenticated()).toBe(false);
+  });
+
+  it('ne rejoue pas la requête sous l’identité précédente quand le refresh est rejeté (pile > 1)', async () => {
+    // Pile : u-précédent au fond, session active au sommet.
+    seedStack([
+      makeSession('access-old', 'refresh-old'),
+      makeSession('access-1', 'refresh-1')
+    ]);
+    const resultPromise = firstValueFrom(httpClient.get(`${BASE}/api/orders`));
+
+    http
+      .expectOne(`${BASE}/api/orders`)
+      .flush(
+        { status: 401, title: 'Unauthorized' },
+        { status: 401, statusText: 'Unauthorized' }
+      );
+    await flushMicrotasks();
+
+    http
+      .expectOne(`${BASE}/api/auth/refresh`)
+      .flush(
+        { status: 401, title: 'Session expirée.' },
+        { status: 401, statusText: 'Unauthorized' }
+      );
+
+    // L'erreur d'origine est propagée : aucun rejeu avec `access-old` (le
+    // http.verify d'afterEach échouerait sur une requête inattendue).
+    await expect(resultPromise).rejects.toMatchObject({ status: 401 });
+    // Seule la session rejetée est retirée : l'utilisateur précédent redevient actif.
+    expect(auth.session()?.accessToken).toBe('access-old');
   });
 });

@@ -14,6 +14,7 @@
          cdkDropList
          cdkDropListOrientation="horizontal"
          [cdkDropListData]="group().id"
+         [cdkDropListEnterPredicate]="tabEnterPredicate"
          (cdkDropListDropped)="onDrop($event)"
          (scroll)="updateScrollState()">
       @for (tab of group().tabs; track tab.id) {
@@ -99,36 +100,40 @@
     <div class="dock-overlay" aria-hidden="true">
       <div class="dock-preview" [class]="'zone-' + dock.zone"></div>
       <div class="dock-guides">
-        <span class="dock-guide guide-top" [class.active]="dock.zone === 'top'">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
-            <rect x="2.5" y="3.5" width="11" height="4" fill="currentColor" />
-          </svg>
-        </span>
-        <span class="dock-guide guide-left" [class.active]="dock.zone === 'left'">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
-            <rect x="2.5" y="3.5" width="4" height="9" fill="currentColor" />
-          </svg>
-        </span>
+        @if (dock.edgeGuides) {
+          <span class="dock-guide guide-top" [class.active]="dock.zone === 'top'">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+              <rect x="2.5" y="3.5" width="11" height="4" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="dock-guide guide-left" [class.active]="dock.zone === 'left'">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+              <rect x="2.5" y="3.5" width="4" height="9" fill="currentColor" />
+            </svg>
+          </span>
+        }
         <span class="dock-guide guide-center" [class.active]="dock.zone === 'center'">
           <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
             <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
             <path d="M1.5 5.5h13" stroke="currentColor" />
           </svg>
         </span>
-        <span class="dock-guide guide-right" [class.active]="dock.zone === 'right'">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
-            <rect x="9.5" y="3.5" width="4" height="9" fill="currentColor" />
-          </svg>
-        </span>
-        <span class="dock-guide guide-bottom" [class.active]="dock.zone === 'bottom'">
-          <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
-            <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
-            <rect x="2.5" y="8.5" width="11" height="4" fill="currentColor" />
-          </svg>
-        </span>
+        @if (dock.edgeGuides) {
+          <span class="dock-guide guide-right" [class.active]="dock.zone === 'right'">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+              <rect x="9.5" y="3.5" width="4" height="9" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="dock-guide guide-bottom" [class.active]="dock.zone === 'bottom'">
+            <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+              <rect x="1.5" y="2.5" width="13" height="11" fill="none" stroke="currentColor" />
+              <rect x="2.5" y="8.5" width="11" height="4" fill="currentColor" />
+            </svg>
+          </span>
+        }
       </div>
     </div>
   }

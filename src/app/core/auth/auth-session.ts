@@ -19,10 +19,11 @@ export interface AuthSession {
 }
 
 /**
- * État publié sur le bus inter-fenêtres (`auth/state`). La forme enveloppée
- * distingue une déconnexion explicite (`authenticated: false`) de l'absence
- * d'état retenu (null renvoyé par le bus).
+ * État publié sur le bus inter-fenêtres (`auth/state`) : la pile de sessions
+ * entière, sommet en dernière position = session active. Un tableau vide
+ * signifie « déconnecté » ; la forme enveloppée distingue une déconnexion
+ * explicite de l'absence d'état retenu (null renvoyé par le bus).
  */
-export type SyncedAuthState =
-  | { readonly authenticated: true; readonly session: AuthSession }
-  | { readonly authenticated: false };
+export interface SyncedAuthState {
+  readonly sessions: readonly AuthSession[];
+}

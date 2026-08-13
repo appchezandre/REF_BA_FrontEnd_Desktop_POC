@@ -4,6 +4,8 @@ import { DockZone } from '../../shared/models/workspace';
 export interface DockTarget {
   readonly groupId: string;
   readonly zone: DockZone;
+  /** Faux quand les guides de bord sont supprimés (dock qui serait un no-op). */
+  readonly edgeGuides: boolean;
 }
 
 /** Demi-côté d'une pastille de guide (pastilles de 40 px). */
@@ -14,12 +16,28 @@ const GUIDE_OFFSET = 44;
 /** Largeur relative des bandes de proximité des bords. */
 const EDGE_BAND = 0.2;
 
+/** Poignées de redimensionnement (bandes de 2-4 px recouvrant les bords des
+    groupes) : le hit-test les traverse en conservant la cible précédente. */
+const RESIZE_HANDLE_SELECTOR =
+  '.split-handle, .panel-resize-handle, .sidebar-resize-handle';
+
 /**
  * Zone de dock sous le pointeur : d'abord les pastilles de la croix de
  * guides (comme Visual Studio), sinon les bandes de proximité des bords,
- * sinon le centre.
+ * sinon le centre. Avec `suppressEdges`, les zones de bord sont dégradées
+ * vers `center` (jamais null : un target null déclencherait le détachement
+ * sous Electron) — cas de l'unique onglet survolant son propre groupe, où
+ * un split serait un no-op.
  */
-function computeZone(rect: DOMRect, x: number, y: number): DockZone {
+export function computeZone(
+  rect: DOMRect,
+  x: number,
+  y: number,
+  suppressEdges = false
+): DockZone {
+  if (suppressEdges) {
+    return 'center';
+  }
   const cx = rect.left + rect.width / 2;
   const cy = rect.top + rect.height / 2;
   const guides: ReadonlyArray<readonly [DockZone, number, number]> = [
@@ -62,17 +80,24 @@ function computeZone(rect: DOMRect, x: number, y: number): DockZone {
 export class TabDragService {
   private readonly draggingSignal = signal<string | null>(null);
   private readonly targetSignal = signal<DockTarget | null>(null, {
-    equal: (a, b) => a?.groupId === b?.groupId && a?.zone === b?.zone
+    equal: (a, b) =>
+      a?.groupId === b?.groupId && a?.zone === b?.zone && a?.edgeGuides === b?.edgeGuides
   });
+  /** Groupe d'origine de l'onglet en cours de drag. */
+  private sourceGroupId: string | null = null;
+  /** Vrai si l'onglet glissé est le seul onglet de son groupe d'origine. */
+  private soleTab = false;
 
   /** Id de l'onglet en cours de drag, sinon null. */
   readonly dragging = this.draggingSignal.asReadonly();
   /** Destination de dock courante, sinon null. */
   readonly target = this.targetSignal.asReadonly();
 
-  start(tabId: string): void {
+  start(tabId: string, sourceGroupId: string, isSoleTab: boolean): void {
     this.draggingSignal.set(tabId);
     this.targetSignal.set(null);
+    this.sourceGroupId = sourceGroupId;
+    this.soleTab = isSoleTab;
   }
 
   updateFromPointer(x: number, y: number): void {
@@ -81,6 +106,10 @@ export class TabDragService {
     }
     // L'aperçu CDK et l'overlay de dock sont en pointer-events: none.
     const element = document.elementFromPoint(x, y);
+    // Poignée de redimensionnement (2-4 px) : cible précédente conservée.
+    if (element?.closest(RESIZE_HANDLE_SELECTOR)) {
+      return;
+    }
     // Au-dessus d'une bande d'onglets, le CDK gère l'insertion : pas de dock.
     if (!element || element.closest('.tab-strip')) {
       this.targetSignal.set(null);
@@ -92,15 +121,21 @@ export class TabDragService {
       this.targetSignal.set(null);
       return;
     }
+    // Unique onglet survolant son propre groupe : un split serait un no-op
+    // (dockTab l'ignore) — on n'affiche que la zone centre.
+    const suppressEdges = this.soleTab && groupId === this.sourceGroupId;
     this.targetSignal.set({
       groupId,
-      zone: computeZone(section.getBoundingClientRect(), x, y)
+      zone: computeZone(section.getBoundingClientRect(), x, y, suppressEdges),
+      edgeGuides: !suppressEdges
     });
   }
 
   clear(): void {
     this.draggingSignal.set(null);
     this.targetSignal.set(null);
+    this.sourceGroupId = null;
+    this.soleTab = false;
   }
 
   /**

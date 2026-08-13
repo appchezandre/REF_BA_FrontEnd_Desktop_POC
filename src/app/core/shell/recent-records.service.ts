@@ -1,4 +1,5 @@
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, effect, inject, signal, untracked } from '@angular/core';
+import { AuthService } from '../auth/auth.service';
 import { WindowSyncService } from '../electron/window-sync.service';
 import { TabType } from '../../shared/models/workspace';
 import { IconName } from '../../shared/components/icon/icon';
@@ -64,6 +65,25 @@ export class RecentRecordsService {
       this.applySyncedState(data)
     );
     inject(DestroyRef).onDestroy(unsubscribe);
+
+    // Bascule d'utilisateur (changement, dépilement) : l'historique est
+    // CONSERVÉ, comme le reste de l'espace de travail (choix produit). Seule
+    // la DÉCONNEXION COMPLÈTE (pile vide) le vide. `clear()` publie — voulu,
+    // l'historique est global ; les publications concurrentes de `[]` par
+    // plusieurs fenêtres sont idempotentes. La comparaison à l'id précédent
+    // évite une purge au premier run et sur rotation de token.
+    const auth = inject(AuthService);
+    let previousUserId = untracked(() => auth.user()?.id ?? null);
+    effect(() => {
+      const userId = auth.user()?.id ?? null;
+      if (userId === previousUserId) {
+        return;
+      }
+      previousUserId = userId;
+      if (userId === null) {
+        this.clear();
+      }
+    });
   }
 
   /** Une feature déclare comment (ré)ouvrir une fiche de ce type de conteneur. */

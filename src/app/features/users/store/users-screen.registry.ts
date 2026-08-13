@@ -29,7 +29,7 @@ export class UsersScreenRegistry {
     this.tabState.register('user-list', { capture: (id) => this.capture(id) });
     // Réouverture d'une fiche utilisateur depuis « Fiches récentes » : on la
     // rouvre directement dans le conteneur Utilisateurs (sans passer par la liste).
-    this.recentRecords.registerOpener('user-list', (key) => this.openRecord(key));
+    this.recentRecords.registerOpener('user-list', (key) => this.openUser(key));
 
     effect(() => {
       const alive = new Set(
@@ -70,8 +70,13 @@ export class UsersScreenRegistry {
    * Ouvre (ou réactive) le conteneur Utilisateurs puis y ouvre directement la
    * fiche demandée — l'utilisateur atterrit sur le détail, pas sur la liste.
    * Réutilise un conteneur existant, en crée un sinon.
+   *
+   * Point d'entrée des ouvertures « par clé » venant d'ailleurs que la liste :
+   * fiches récentes et bouton Compte de la barre d'activité. La clé est
+   * acceptée même si la liste n'est pas encore chargée (la fiche s'affiche à
+   * l'arrivée des données, cf. `UsersScreenStore.openDetail`).
    */
-  private openRecord(key: string): void {
+  openUser(key: string): void {
     let tab = this.findUserListTab();
     if (tab) {
       this.workspace.activateTab(tab.id);

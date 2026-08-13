@@ -339,15 +339,17 @@ export class MaintenanceService {
       return;
     }
     if (next.phase === 'frozen' && previous.phase !== 'frozen') {
-      // Le voile est déjà rendu (signal positionné) : la session est fermée
-      // ensuite, ce qui se propage à toutes les fenêtres par `auth/state`.
+      // Le voile est déjà rendu (signal positionné) : TOUTES les sessions de
+      // la pile sont fermées ensuite (pas seulement l'active — un simple
+      // dépilement rendrait la main à l'utilisateur précédent), ce qui se
+      // propage à toutes les fenêtres par `auth/state`.
       //
       // Exception : la fenêtre qui a déclenché la maintenance CONSERVE sa
-      // session. `POST /api/Maintenance/stop` exige la permission
+      // pile. `POST /api/Maintenance/stop` exige la permission
       // `Maintenance.Manage` ; la déconnecter la priverait du seul moyen de
       // lever la maintenance.
       if (!this.initiatedLocallySignal() && this.auth.isAuthenticated()) {
-        void this.auth.logout();
+        void this.auth.logoutAll();
       }
     }
   }

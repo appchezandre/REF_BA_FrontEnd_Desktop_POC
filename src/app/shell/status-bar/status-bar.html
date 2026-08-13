@@ -7,10 +7,20 @@
     <span class="status-item">{{ store.totalTabCount() }} onglet(s)</span>
     <span class="status-item">{{ store.groups().length }} groupe(s)</span>
     @if (userLabel(); as user) {
-      <span class="status-item">{{ user }}</span>
+      <span class="status-item">
+        {{ user }}
+        @if (stackedCount() > 0) {
+          <span class="status-stack-badge"
+                [title]="'Reviendra à ' + previousUserLabel()">+{{ stackedCount() }}</span>
+        }
+      </span>
+      <button type="button" class="status-item status-button" (click)="switchUser()"
+              title="Changer d'utilisateur : l'utilisateur actuel restera connecté, inactif">
+        Changer d'utilisateur
+      </button>
       <button type="button" class="status-item status-button" (click)="logout()"
-              title="Se déconnecter (toutes les fenêtres)">
-        Se déconnecter
+              [title]="logoutTitle()">
+        {{ logoutLabel() }}
       </button>
     }
   </div>

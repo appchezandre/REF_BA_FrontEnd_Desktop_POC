@@ -337,6 +337,11 @@ export class WorkspaceStore {
     }
 
     if (zone === 'center') {
+      // Centre sur son propre groupe : l'onglet reste où il est (comme
+      // VS Code) — sans ce garde, transferTab le déplacerait en fin de bande.
+      if (source.id === target.id) {
+        return;
+      }
       this.transferTab(source.id, target.id, tabId, target.tabs.length);
       return;
     }

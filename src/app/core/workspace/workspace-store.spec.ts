@@ -504,6 +504,24 @@ describe('WorkspaceStore', () => {
       expect(split.second.kind).toBe('group');
     });
 
+    it('center sur son propre groupe : l’onglet garde sa position', () => {
+      openThree();
+      const before = store.layout();
+      const group = store.groups()[0];
+      const middle = group.tabs[1]; // welcome, customer-list, order-list, article-list
+      store.dockTab(middle.id, group.id, 'center');
+      expect(store.layout()).toBe(before);
+      expect(store.groups()[0].tabs[1].id).toBe(middle.id);
+      expect(store.groups()[0].tabs).toHaveLength(4);
+    });
+
+    it('center sur son propre groupe à onglet unique : layout inchangé', () => {
+      const before = store.layout();
+      const welcome = store.activeTab()!;
+      store.dockTab(welcome.id, store.groups()[0].id, 'center');
+      expect(store.layout()).toBe(before);
+    });
+
     it('no-op pour un split sur son propre groupe à onglet unique', () => {
       const welcome = store.activeTab()!;
       store.dockTab(welcome.id, store.groups()[0].id, 'right');

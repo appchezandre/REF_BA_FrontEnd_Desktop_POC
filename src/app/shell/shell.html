@@ -40,6 +40,10 @@
     (cancelled)="closeGuard.cancelClose()" />
 }
 
+@if (shellUi.userSwitchDialogVisible()) {
+  <app-user-switch-dialog (closed)="shellUi.closeUserSwitchDialog()" />
+}
+
 @if (windowClose.pending()) {
   <app-confirm-dialog
     title="Quitter sans enregistrer ?"

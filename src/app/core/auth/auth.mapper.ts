@@ -86,18 +86,26 @@ function parseSyncedSession(raw: unknown): AuthSession | null {
   };
 }
 
-/** Valide un état d'auth complet reçu du bus ; null si le payload est invalide. */
+/**
+ * Valide un état d'auth complet reçu du bus ; null si le payload est invalide.
+ * Le payload IPC n'est pas fiable : une seule entrée invalide dans la pile
+ * rejette l'état entier plutôt que d'appliquer une pile partielle.
+ */
 export function parseSyncedAuthState(raw: unknown): SyncedAuthState | null {
   if (typeof raw !== 'object' || raw === null) {
     return null;
   }
   const value = raw as Record<string, unknown>;
-  if (value['authenticated'] === false) {
-    return { authenticated: false };
-  }
-  if (value['authenticated'] !== true) {
+  if (!Array.isArray(value['sessions'])) {
     return null;
   }
-  const session = parseSyncedSession(value['session']);
-  return session ? { authenticated: true, session } : null;
+  const sessions: AuthSession[] = [];
+  for (const entry of value['sessions']) {
+    const session = parseSyncedSession(entry);
+    if (!session) {
+      return null;
+    }
+    sessions.push(session);
+  }
+  return { sessions };
 }

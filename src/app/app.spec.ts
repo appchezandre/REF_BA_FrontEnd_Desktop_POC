@@ -120,14 +120,15 @@ describe('App', () => {
     mock.emitSyncEvent({
       topic: 'auth/state',
       data: {
-        authenticated: true,
-        session: {
-          accessToken: 'access-1',
-          accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
-          refreshToken: 'refresh-1',
-          refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
-          user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
-        }
+        sessions: [
+          {
+            accessToken: 'access-1',
+            accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
+            refreshToken: 'refresh-1',
+            refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
+            user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
+          }
+        ]
       },
       sourceWindowId: 'win-b'
     });
@@ -169,14 +170,15 @@ describe('App', () => {
     mock.emitSyncEvent({
       topic: 'auth/state',
       data: {
-        authenticated: true,
-        session: {
-          accessToken: 'access-1',
-          accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
-          refreshToken: 'refresh-1',
-          refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
-          user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
-        }
+        sessions: [
+          {
+            accessToken: 'access-1',
+            accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
+            refreshToken: 'refresh-1',
+            refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
+            user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
+          }
+        ]
       },
       sourceWindowId: 'win-b'
     });
@@ -207,14 +209,15 @@ describe('App', () => {
     mock.emitSyncEvent({
       topic: 'auth/state',
       data: {
-        authenticated: true,
-        session: {
-          accessToken: 'access-1',
-          accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
-          refreshToken: 'refresh-1',
-          refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
-          user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
-        }
+        sessions: [
+          {
+            accessToken: 'access-1',
+            accessTokenExpiresAtUtc: '2026-07-17T13:00:00Z',
+            refreshToken: 'refresh-1',
+            refreshTokenExpiresAtUtc: '2026-07-24T12:00:00Z',
+            user: { id: 'u-1', email: 'user@test.fr', displayName: 'Utilisateur Test' }
+          }
+        ]
       },
       sourceWindowId: 'win-b'
     });

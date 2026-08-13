@@ -1,0 +1,37 @@
+/* Sous le voile de maintenance (z-index 2000), au-dessus des dialogs de
+   confirmation (1000) : au gel, le voile doit recouvrir ce dialog. */
+.switch-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.switch-dialog {
+  width: min(360px, calc(100vw - 48px));
+  padding: 24px;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-dialog-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  color: var(--vscode-fg);
+}
+
+.switch-dialog:focus {
+  outline: none;
+}
+
+.switch-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.switch-subtitle {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--vscode-fg-dim);
+}

@@ -13,9 +13,12 @@ export type ActivityView = 'explorer' | 'search';
 export class ShellUiService {
   private readonly activityViewSignal = signal<ActivityView>('explorer');
   private readonly sidebarVisibleSignal = signal(true);
+  private readonly userSwitchDialogVisibleSignal = signal(false);
 
   readonly activityView = this.activityViewSignal.asReadonly();
   readonly sidebarVisible = this.sidebarVisibleSignal.asReadonly();
+  /** Dialog « Changer d'utilisateur » (rendu par `Shell`, ouvert depuis la status-bar). */
+  readonly userSwitchDialogVisible = this.userSwitchDialogVisibleSignal.asReadonly();
 
   /**
    * Sélection d'une vue depuis la barre d'activité : re-cliquer sur la vue
@@ -38,5 +41,13 @@ export class ShellUiService {
   revealSearch(): void {
     this.activityViewSignal.set('search');
     this.sidebarVisibleSignal.set(true);
+  }
+
+  openUserSwitchDialog(): void {
+    this.userSwitchDialogVisibleSignal.set(true);
+  }
+
+  closeUserSwitchDialog(): void {
+    this.userSwitchDialogVisibleSignal.set(false);
   }
 }

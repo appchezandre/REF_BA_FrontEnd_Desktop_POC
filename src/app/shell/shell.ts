@@ -13,6 +13,7 @@ import { TabDetachService } from '../core/workspace/tab-detach.service';
 import { WindowCloseService } from '../core/workspace/window-close.service';
 import { WorkspaceCloseService } from '../core/workspace/workspace-close.service';
 import { WorkspaceStore } from '../core/workspace/workspace-store';
+import { UserSwitchDialog } from '../features/auth/components/user-switch-dialog/user-switch-dialog';
 import { ConfirmDialog } from '../shared/components/confirm-dialog/confirm-dialog';
 import { ActivityBar } from './activity-bar/activity-bar';
 import { EditorArea } from './editor/editor-area';
@@ -37,7 +38,16 @@ function clamp(value: number, min: number, max: number): number {
  */
 @Component({
   selector: 'app-shell',
-  imports: [TitleBar, ActivityBar, SideBar, EditorArea, Panel, StatusBar, ConfirmDialog],
+  imports: [
+    TitleBar,
+    ActivityBar,
+    SideBar,
+    EditorArea,
+    Panel,
+    StatusBar,
+    ConfirmDialog,
+    UserSwitchDialog
+  ],
   templateUrl: './shell.html',
   styleUrl: './shell.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

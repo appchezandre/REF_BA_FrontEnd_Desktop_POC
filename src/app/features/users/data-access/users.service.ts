@@ -1,8 +1,9 @@
 import { HttpClient } from '@angular/common/http';
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, effect, inject, signal, untracked } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { extractApiErrorMessage } from '../../../core/api/problem-details';
+import { AuthService } from '../../../core/auth/auth.service';
 import { WindowSyncService } from '../../../core/electron/window-sync.service';
 import { User, UserAccess, UserDraft, UserPermission, UserRole } from '../models/user';
 import {
@@ -67,6 +68,36 @@ export class UsersService {
       this.applySyncedState(data)
     );
     inject(DestroyRef).onDestroy(unsubscribe);
+
+    // Bascule d'utilisateur (changement, dépilement) : l'état est CONSERVÉ —
+    // les listes chargées et les saisies en cours survivent (choix produit).
+    // Seule la DÉCONNEXION COMPLÈTE (pile vide) purge, pour ne pas resservir
+    // le cache d'un utilisateur à la prochaine connexion. Le rechargement est
+    // paresseux (prochain `ensureLoaded()`) et l'état vidé n'est PAS publié :
+    // chaque fenêtre purge d'elle-même via son propre effect (l'état d'auth
+    // est déjà synchronisé), publier `[]` créerait des courses avec le premier
+    // rechargement. La comparaison à l'id précédent évite une purge au premier
+    // run et sur simple rotation de token.
+    const auth = inject(AuthService);
+    let previousUserId = untracked(() => auth.user()?.id ?? null);
+    effect(() => {
+      const userId = auth.user()?.id ?? null;
+      if (userId === previousUserId) {
+        return;
+      }
+      previousUserId = userId;
+      if (userId === null) {
+        this.clearForLogout();
+      }
+    });
+  }
+
+  /** Oublie tout l'état chargé (déconnexion complète uniquement). */
+  private clearForLogout(): void {
+    this.usersSignal.set([]);
+    this.errorSignal.set(null);
+    this.accessCache.clear();
+    this.loadRequested = false;
   }
 
   /** Déclenche le premier chargement (idempotent) — appelé par l'écran. */

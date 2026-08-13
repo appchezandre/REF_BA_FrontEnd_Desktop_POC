@@ -133,6 +133,15 @@ export class EditorGroupPane {
       ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   }
 
+  /**
+   * N'accepte dans la bande d'onglets que les drags d'onglets du workspace
+   * (data = id d'onglet). Sans ce filtre, tout `cdkDrag` étranger rattaché
+   * par erreur au groupe de l'éditeur (ex. un en-tête de colonne) pourrait
+   * y être déposé.
+   */
+  protected readonly tabEnterPredicate = (drag: CdkDrag<unknown>): boolean =>
+    typeof drag.data === 'string' && this.store.findTab(drag.data) !== null;
+
   protected onTabClick(tab: WorkspaceTab): void {
     this.store.activateTab(tab.id);
   }
@@ -150,7 +159,7 @@ export class EditorGroupPane {
   }
 
   protected onDragStarted(tab: WorkspaceTab): void {
-    this.dragService.start(tab.id);
+    this.dragService.start(tab.id, this.group().id, this.group().tabs.length === 1);
   }
 
   protected onDragMoved(event: CdkDragMove<string>): void {

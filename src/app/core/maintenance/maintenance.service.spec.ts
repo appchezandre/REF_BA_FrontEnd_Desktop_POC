@@ -43,7 +43,7 @@ describe('MaintenanceService', () => {
     stop: ReturnType<typeof vi.fn>;
   };
   let publish: ReturnType<typeof vi.fn>;
-  let logout: ReturnType<typeof vi.fn>;
+  let logoutAll: ReturnType<typeof vi.fn>;
   let hubStart: ReturnType<typeof vi.fn>;
   let hubConnected: boolean;
   let isAuthenticated: WritableSignal<boolean>;
@@ -81,7 +81,7 @@ describe('MaintenanceService', () => {
       stop: vi.fn(() => Promise.resolve(notification(false)))
     };
     publish = vi.fn();
-    logout = vi.fn(() => Promise.resolve());
+    logoutAll = vi.fn(() => Promise.resolve());
     hubStart = vi.fn((handlers?: MaintenanceHubHandlers) => {
       if (handlers) {
         hubHandlers = handlers;
@@ -116,7 +116,9 @@ describe('MaintenanceService', () => {
             }
           }
         },
-        { provide: AuthService, useValue: { isAuthenticated, logout } }
+        // Le gel ferme TOUTE la pile de sessions (logoutAll), pas seulement
+        // la session active (un dépilement rendrait la main au précédent).
+        { provide: AuthService, useValue: { isAuthenticated, logoutAll } }
       ]
     });
   });
@@ -142,7 +144,7 @@ describe('MaintenanceService', () => {
 
     expect(service.phase()).toBe('frozen');
     expect(service.message()).toBe('Migration.');
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(logoutAll).toHaveBeenCalledTimes(1);
   });
 
   it('ne publie rien à l’amorçage : elle apprend l’état, ne l’annonce pas', async () => {
@@ -164,7 +166,7 @@ describe('MaintenanceService', () => {
       expect(service.frozen()).toBe(false);
       expect(service.underMaintenance()).toBe(true);
       // L'utilisateur doit pouvoir enregistrer : la session reste ouverte.
-      expect(logout).not.toHaveBeenCalled();
+      expect(logoutAll).not.toHaveBeenCalled();
       expect(service.remainingSeconds()).toBe(GRACE_PERIOD_MS / 1000);
     });
 
@@ -186,7 +188,7 @@ describe('MaintenanceService', () => {
 
       expect(service.phase()).toBe('frozen');
       expect(service.remainingSeconds()).toBe(0);
-      expect(logout).toHaveBeenCalledTimes(1);
+      expect(logoutAll).toHaveBeenCalledTimes(1);
       expect(publish).toHaveBeenCalledWith(
         MAINTENANCE_SYNC_TOPIC,
         expect.objectContaining({ phase: 'frozen', graceDeadlineMs: null })
@@ -198,7 +200,7 @@ describe('MaintenanceService', () => {
 
       await vi.advanceTimersByTimeAsync(GRACE_PERIOD_MS + 60_000);
 
-      expect(logout).toHaveBeenCalledTimes(1);
+      expect(logoutAll).toHaveBeenCalledTimes(1);
     });
 
     it('ne redémarre pas le sursis quand le message est mis à jour', async () => {
@@ -227,7 +229,7 @@ describe('MaintenanceService', () => {
       // Le minuteur est bien désarmé : aucun gel tardif.
       await vi.advanceTimersByTimeAsync(GRACE_PERIOD_MS);
       expect(service.phase()).toBe('operational');
-      expect(logout).not.toHaveBeenCalled();
+      expect(logoutAll).not.toHaveBeenCalled();
     });
 
     it('partage l’échéance avec les autres fenêtres', async () => {
@@ -274,7 +276,7 @@ describe('MaintenanceService', () => {
       });
 
       expect(service.phase()).toBe('frozen');
-      expect(logout).toHaveBeenCalledTimes(1);
+      expect(logoutAll).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -284,7 +286,7 @@ describe('MaintenanceService', () => {
 
     await vi.advanceTimersByTimeAsync(GRACE_PERIOD_MS);
 
-    expect(logout).not.toHaveBeenCalled();
+    expect(logoutAll).not.toHaveBeenCalled();
   });
 
   it('ignore un payload de bus invalide', async () => {
@@ -318,7 +320,7 @@ describe('MaintenanceService', () => {
 
     // `stop` exige la permission `Maintenance.Manage` : la déconnecter la
     // priverait du seul moyen de lever la maintenance.
-    expect(logout).not.toHaveBeenCalled();
+    expect(logoutAll).not.toHaveBeenCalled();
     expect(service.phase()).toBe('frozen');
   });
 
@@ -336,7 +338,7 @@ describe('MaintenanceService', () => {
     await pending;
 
     expect(service.phase()).toBe('frozen');
-    expect(logout).not.toHaveBeenCalled();
+    expect(logoutAll).not.toHaveBeenCalled();
     // Les autres fenêtres reçoivent malgré tout le sursis.
     const published = publish.mock.calls.find(
       ([topic]) => topic === MAINTENANCE_SYNC_TOPIC
@@ -366,7 +368,7 @@ describe('MaintenanceService', () => {
     await pending;
 
     expect(service.phase()).toBe('frozen');
-    expect(logout).not.toHaveBeenCalled();
+    expect(logoutAll).not.toHaveBeenCalled();
   });
 
   it('diffuse malgré tout le sursis aux autres fenêtres', async () => {

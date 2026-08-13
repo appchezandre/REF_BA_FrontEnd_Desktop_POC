@@ -24,8 +24,12 @@
   color: var(--vscode-activitybar-fg);
 }
 
-.activity-item:hover {
+.activity-item:hover:not(:disabled) {
   color: var(--vscode-activitybar-fg-active);
+}
+
+.activity-item:disabled {
+  opacity: 0.4;
 }
 
 .activity-item.active {

@@ -38,3 +38,13 @@
   font: inherit;
   cursor: pointer;
 }
+
+/* Sessions restées connectées derrière l'utilisateur actif (pile). */
+.status-stack-badge {
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 10px;
+  line-height: 14px;
+}

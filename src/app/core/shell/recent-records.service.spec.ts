@@ -1,6 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MAX_RECENT_RECORDS, RecentRecord, RecentRecordsService } from './recent-records.service';
+import { AuthService } from '../auth/auth.service';
+import { AuthUser } from '../auth/auth-session';
 import { WindowSyncService } from '../electron/window-sync.service';
 
 function record(recordId: string, title = `Commande ${recordId}`): RecentRecord {
@@ -13,10 +16,22 @@ function record(recordId: string, title = `Commande ${recordId}`): RecentRecord 
   };
 }
 
+/** Doublure d'AuthService : évite tout HTTP, pilote l'utilisateur actif. */
+class AuthServiceStub {
+  readonly user = signal<AuthUser | null>({
+    id: 'u-1',
+    email: 'user1@test.fr',
+    displayName: 'Utilisateur 1'
+  });
+}
+
 describe('RecentRecordsService', () => {
   let service: RecentRecordsService;
 
   beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [{ provide: AuthService, useValue: new AuthServiceStub() }]
+    });
     service = TestBed.inject(RecentRecordsService);
   });
 
@@ -91,11 +106,16 @@ describe('RecentRecordsService — synchronisation globale (bus inter-fenêtres)
 
   let service: RecentRecordsService;
   let sync: FakeWindowSync;
+  let auth: AuthServiceStub;
 
   beforeEach(() => {
     sync = new FakeWindowSync();
+    auth = new AuthServiceStub();
     TestBed.configureTestingModule({
-      providers: [{ provide: WindowSyncService, useValue: sync }]
+      providers: [
+        { provide: WindowSyncService, useValue: sync },
+        { provide: AuthService, useValue: auth }
+      ]
     });
     service = TestBed.inject(RecentRecordsService);
   });
@@ -122,5 +142,35 @@ describe('RecentRecordsService — synchronisation globale (bus inter-fenêtres)
     service.add(record('A'));
     sync.emit('n’importe quoi');
     expect(service.records().map((r) => r.recordId)).toEqual(['A']);
+  });
+
+  it('conserve l’historique au changement d’utilisateur actif', () => {
+    service.add(record('A'));
+    auth.user.set({ id: 'u-2', email: 'user2@test.fr', displayName: 'Utilisateur 2' });
+    TestBed.tick(); // laisse l'effect s'exécuter
+
+    expect(service.records()).toHaveLength(1);
+  });
+
+  it('vide l’historique (et le publie) à la déconnexion complète', () => {
+    service.add(record('A'));
+    auth.user.set(null);
+    TestBed.tick();
+
+    expect(service.records()).toEqual([]);
+    const last = sync.published.at(-1);
+    expect(last?.topic).toBe('recent-records/state');
+    expect(last?.data).toEqual([]);
+  });
+
+  it('ne purge ni au premier run ni sur rotation de token (même id)', () => {
+    service.add(record('A'));
+    TestBed.tick(); // premier run de l'effect : pas de purge
+    expect(service.records()).toHaveLength(1);
+
+    // Rotation de token : nouvelle référence d'objet, même identité.
+    auth.user.set({ id: 'u-1', email: 'user1@test.fr', displayName: 'Utilisateur 1' });
+    TestBed.tick();
+    expect(service.records()).toHaveLength(1);
   });
 });

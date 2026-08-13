@@ -1,0 +1,20 @@
+<div class="switch-backdrop" (click)="closed.emit()">
+  <div class="switch-dialog" #container tabindex="-1" role="dialog" aria-modal="true"
+       aria-labelledby="user-switch-title" (click)="$event.stopPropagation()">
+    <h2 class="switch-title" id="user-switch-title">Changer d'utilisateur</h2>
+    @if (currentUserLabel(); as current) {
+      <p class="switch-subtitle">
+        {{ current }} restera connecté et redeviendra actif après déconnexion
+        du nouvel utilisateur.
+      </p>
+    }
+
+    <app-login-form
+      submitLabel="Changer d'utilisateur"
+      [submitting]="submitting()"
+      [error]="error()"
+      [showCancel]="true"
+      (submitted)="onSubmit($event)"
+      (cancelled)="closed.emit()" />
+  </div>
+</div>

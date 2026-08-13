@@ -29,7 +29,8 @@
   </div>
 
   <div class="activity-bottom">
-    <button type="button" class="activity-item" aria-label="Comptes" title="Comptes">
+    <button type="button" class="activity-item" aria-label="Compte" title="Compte"
+            [disabled]="!hasAccount()" (click)="openAccount()">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
            stroke-width="1.5" aria-hidden="true">
         <circle cx="12" cy="8.5" r="4" />
