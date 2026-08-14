@@ -1,0 +1,62 @@
+@if (job(); as j) {
+  <div class="jobs-panel" aria-live="polite">
+    <h3 class="job-title">Génération des factures — {{ periodLabel() }}</h3>
+
+    @if (j.resumed) {
+      <p class="job-info">
+        Un traitement était déjà en cours pour cette période : suivi repris.
+      </p>
+    }
+
+    <p class="job-status" [class.failed]="j.status === 'failed'">{{ statusLabel() }}</p>
+
+    @let p = percent();
+    @if (p !== null) {
+      <progress class="job-progress" max="100" [value]="p" aria-label="Progression">
+      </progress>
+      <p class="job-counts">{{ j.processed }} / {{ j.total }} ({{ p }} %)</p>
+    } @else if (!terminal()) {
+      <!-- Sans attribut value : progression nativement indéterminée. -->
+      <progress class="job-progress" aria-label="Progression indéterminée"></progress>
+    }
+
+    @if (j.message) {
+      <p class="job-message">
+        {{ j.message }}
+        @if (lastUpdateLabel()) {
+          <span class="job-timestamp">({{ lastUpdateLabel() }})</span>
+        }
+      </p>
+    }
+
+    @if (waiting()) {
+      <p class="job-waiting">En attente de nouvelles du serveur…</p>
+    }
+
+    @if (cancelError(); as error) {
+      <p class="job-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="job-actions">
+      @if (canCancel()) {
+        <button type="button" class="job-action" [disabled]="cancelling()"
+                (click)="cancel()">
+          {{ cancelling() ? 'Annulation…' : 'Annuler' }}
+        </button>
+      }
+      @if (terminal()) {
+        <button type="button" class="job-action" (click)="dismiss()">Masquer</button>
+      }
+    </div>
+
+    <p class="job-note">Suivi visible dans cette fenêtre uniquement.</p>
+  </div>
+} @else {
+  <div class="jobs-panel">
+    <p class="job-empty">Aucun traitement en cours.</p>
+    <p class="job-note">
+      Lancez la génération des factures depuis Modules&nbsp;/ Ventes&nbsp;/
+      Génération Factures.
+    </p>
+  </div>
+}

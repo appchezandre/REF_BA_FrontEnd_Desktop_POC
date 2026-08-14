@@ -35,4 +35,27 @@ describe('ShellUiService', () => {
     expect(ui.activityView()).toBe('search');
     expect(ui.sidebarVisible()).toBe(true);
   });
+
+  it('revealJobs ouvre les traitements en cours même side bar masquée', () => {
+    ui.toggleSidebar();
+    ui.revealJobs();
+    expect(ui.activityView()).toBe('jobs');
+    expect(ui.sidebarVisible()).toBe(true);
+  });
+
+  it('ouvre et ferme le dialog Génération Factures', () => {
+    expect(ui.invoiceGenerationDialogVisible()).toBe(false);
+    ui.openInvoiceGenerationDialog();
+    expect(ui.invoiceGenerationDialogVisible()).toBe(true);
+    ui.closeInvoiceGenerationDialog();
+    expect(ui.invoiceGenerationDialogVisible()).toBe(false);
+  });
+
+  it('expose l’activité des traitements pour la pastille', () => {
+    expect(ui.jobActivity()).toBe(false);
+    ui.setJobActivity(true);
+    expect(ui.jobActivity()).toBe(true);
+    ui.setJobActivity(false);
+    expect(ui.jobActivity()).toBe(false);
+  });
 });

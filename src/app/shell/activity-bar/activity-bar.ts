@@ -8,7 +8,7 @@ import {
 } from '@angular/core';
 import { AuthService } from '../../core/auth/auth.service';
 import { WorkspaceStore } from '../../core/workspace/workspace-store';
-import { ActivityView } from '../../core/shell/shell-ui.service';
+import { ActivityView, ShellUiService } from '../../core/shell/shell-ui.service';
 
 export type { ActivityView };
 
@@ -34,13 +34,28 @@ export class ActivityBar {
   readonly sidebarVisible = input.required<boolean>();
   readonly selected = output<ActivityView>();
 
+  /**
+   * Pastille « un traitement est actif » : lue sur `ShellUiService` (bundle
+   * initial) et non sur `InvoiceGenerationService`, qui vit dans un chunk
+   * différé avec le reste de `core/invoicing`.
+   */
+  protected readonly jobActivity = inject(ShellUiService).jobActivity;
+
   protected readonly items: readonly ActivityItem[] = [
     { id: 'explorer', label: 'Explorateur' },
-    { id: 'search', label: 'Rechercher' }
+    { id: 'search', label: 'Rechercher' },
+    { id: 'jobs', label: 'Traitements en cours' }
   ];
 
   protected isActive(id: ActivityView): boolean {
     return this.active() === id && this.sidebarVisible();
+  }
+
+  /** La pastille est décorative : l'information passe par le libellé. */
+  protected labelFor(item: ActivityItem): string {
+    return item.id === 'jobs' && this.jobActivity()
+      ? `${item.label} — un traitement est actif`
+      : item.label;
   }
 
   protected openSettings(): void {

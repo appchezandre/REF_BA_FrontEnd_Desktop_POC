@@ -16,6 +16,7 @@ import { WorkspaceStore } from '../core/workspace/workspace-store';
 import { UserSwitchDialog } from '../features/auth/components/user-switch-dialog/user-switch-dialog';
 import { ConfirmDialog } from '../shared/components/confirm-dialog/confirm-dialog';
 import { ActivityBar } from './activity-bar/activity-bar';
+import { InvoiceGenerationDialog } from './invoice-generation-dialog/invoice-generation-dialog';
 import { EditorArea } from './editor/editor-area';
 import { Panel } from './panel/panel';
 import { SideBar } from './side-bar/side-bar';
@@ -46,7 +47,8 @@ function clamp(value: number, min: number, max: number): number {
     Panel,
     StatusBar,
     ConfirmDialog,
-    UserSwitchDialog
+    UserSwitchDialog,
+    InvoiceGenerationDialog
   ],
   templateUrl: './shell.html',
   styleUrl: './shell.css',

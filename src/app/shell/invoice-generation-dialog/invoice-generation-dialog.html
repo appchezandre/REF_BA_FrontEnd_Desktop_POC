@@ -1,0 +1,43 @@
+<div class="invoice-backdrop" (click)="closed.emit()">
+  <div class="invoice-dialog" #container tabindex="-1" role="dialog" aria-modal="true"
+       aria-labelledby="invoice-generation-title" (click)="$event.stopPropagation()">
+    <h2 class="invoice-title" id="invoice-generation-title">Génération Factures</h2>
+    <p class="invoice-subtitle">
+      Lance la génération des factures de vente de la période choisie. La
+      progression s'affiche dans « Traitements en cours ».
+    </p>
+
+    <form class="invoice-form" (submit)="onSubmit($event)">
+      <label class="field">
+        <span class="field-label">Mois</span>
+        <select [value]="month()" (change)="onMonthChange($event)">
+          @for (label of months; track $index) {
+            <option [value]="$index + 1" [selected]="$index + 1 === month()">
+              {{ label }}
+            </option>
+          }
+        </select>
+      </label>
+
+      <label class="field">
+        <span class="field-label">Année</span>
+        <input type="number" [min]="minYear" [max]="maxYear" required
+               [value]="year()" (input)="onYearChange($event)" />
+      </label>
+
+      @if (error(); as message) {
+        <p class="invoice-error" role="alert">{{ message }}</p>
+      }
+
+      <footer class="invoice-actions">
+        <button type="submit" class="action-primary"
+                [disabled]="!valid() || submitting()">
+          {{ submitting() ? 'Lancement…' : 'Lancer le traitement' }}
+        </button>
+        <button type="button" class="action-secondary" (click)="closed.emit()">
+          Annuler
+        </button>
+      </footer>
+    </form>
+  </div>
+</div>

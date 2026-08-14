@@ -6,6 +6,7 @@ import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { ActivityBar } from './activity-bar';
 import { AuthService } from '../../core/auth/auth.service';
 import { AuthSession, AuthUser } from '../../core/auth/auth-session';
+import { ShellUiService } from '../../core/shell/shell-ui.service';
 import { WorkspaceStore } from '../../core/workspace/workspace-store';
 import { UsersScreenRegistry } from '../../features/users/store/users-screen.registry';
 
@@ -131,5 +132,50 @@ describe('ActivityBar — bouton Compte', () => {
     await waitFor(() => userTabId() !== undefined);
 
     expect(registry.forTab(userTabId()!).activeView()).toBe('9');
+  });
+});
+
+describe('ActivityBar — item Traitements en cours', () => {
+  let fixture: ComponentFixture<Host>;
+  let shellUi: ShellUiService;
+
+  function jobsButton(): HTMLButtonElement {
+    const host = fixture.nativeElement as HTMLElement;
+    const button = host.querySelector<HTMLButtonElement>(
+      'button[title="Traitements en cours"]'
+    );
+    expect(button).toBeTruthy();
+    return button!;
+  }
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
+        { provide: AuthService, useValue: new AuthServiceStub() }
+      ]
+    });
+    shellUi = TestBed.inject(ShellUiService);
+    fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+  });
+
+  it('est rendu dans la barre avec sa roue dentée', () => {
+    const button = jobsButton();
+    expect(button.querySelector('svg')).toBeTruthy();
+    expect(button.getAttribute('aria-label')).toBe('Traitements en cours');
+  });
+
+  it('affiche la pastille et enrichit le libellé quand un traitement est actif', () => {
+    expect(jobsButton().querySelector('.activity-badge')).toBeNull();
+
+    shellUi.setJobActivity(true);
+    fixture.detectChanges();
+
+    expect(jobsButton().querySelector('.activity-badge')).toBeTruthy();
+    expect(jobsButton().getAttribute('aria-label')).toBe(
+      'Traitements en cours — un traitement est actif'
+    );
   });
 });

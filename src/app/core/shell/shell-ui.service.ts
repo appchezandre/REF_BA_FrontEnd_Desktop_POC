@@ -1,7 +1,10 @@
 import { Injectable, signal } from '@angular/core';
 
-/** Panneau latéral actif : explorateur des écrans ou recherche contextuelle. */
-export type ActivityView = 'explorer' | 'search';
+/**
+ * Panneau latéral actif : explorateur des écrans, recherche contextuelle ou
+ * suivi des traitements en cours.
+ */
+export type ActivityView = 'explorer' | 'search' | 'jobs';
 
 /**
  * État d'interface transverse du shell (visibilité et vue de la side bar).
@@ -14,11 +17,23 @@ export class ShellUiService {
   private readonly activityViewSignal = signal<ActivityView>('explorer');
   private readonly sidebarVisibleSignal = signal(true);
   private readonly userSwitchDialogVisibleSignal = signal(false);
+  private readonly invoiceGenerationDialogVisibleSignal = signal(false);
+  private readonly jobActivitySignal = signal(false);
 
   readonly activityView = this.activityViewSignal.asReadonly();
   readonly sidebarVisible = this.sidebarVisibleSignal.asReadonly();
   /** Dialog « Changer d'utilisateur » (rendu par `Shell`, ouvert depuis la status-bar). */
   readonly userSwitchDialogVisible = this.userSwitchDialogVisibleSignal.asReadonly();
+  /** Dialog « Génération Factures » (rendu par `Shell`, ouvert depuis la side bar). */
+  readonly invoiceGenerationDialogVisible =
+    this.invoiceGenerationDialogVisibleSignal.asReadonly();
+  /**
+   * Un traitement d'arrière-plan est actif : pastille sur l'icône
+   * « Traitements en cours » de la barre d'activité. Positionné par
+   * `InvoiceGenerationService` : porté ici pour que la barre d'activité
+   * (bundle initial) n'importe rien de `core/invoicing` (chunk différé).
+   */
+  readonly jobActivity = this.jobActivitySignal.asReadonly();
 
   /**
    * Sélection d'une vue depuis la barre d'activité : re-cliquer sur la vue
@@ -43,11 +58,29 @@ export class ShellUiService {
     this.sidebarVisibleSignal.set(true);
   }
 
+  /** Ouvre la side bar sur la vue « Traitements en cours ». */
+  revealJobs(): void {
+    this.activityViewSignal.set('jobs');
+    this.sidebarVisibleSignal.set(true);
+  }
+
   openUserSwitchDialog(): void {
     this.userSwitchDialogVisibleSignal.set(true);
   }
 
   closeUserSwitchDialog(): void {
     this.userSwitchDialogVisibleSignal.set(false);
+  }
+
+  openInvoiceGenerationDialog(): void {
+    this.invoiceGenerationDialogVisibleSignal.set(true);
+  }
+
+  closeInvoiceGenerationDialog(): void {
+    this.invoiceGenerationDialogVisibleSignal.set(false);
+  }
+
+  setJobActivity(active: boolean): void {
+    this.jobActivitySignal.set(active);
   }
 }

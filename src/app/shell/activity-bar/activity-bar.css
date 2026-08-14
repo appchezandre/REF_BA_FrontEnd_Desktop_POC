@@ -45,3 +45,15 @@
   width: 2px;
   background: var(--vscode-activitybar-fg-active);
 }
+
+/* Pastille « traitement actif » sur l'icône Traitements en cours. */
+.activity-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--vscode-accent);
+  border: 1px solid var(--vscode-activitybar-bg);
+}

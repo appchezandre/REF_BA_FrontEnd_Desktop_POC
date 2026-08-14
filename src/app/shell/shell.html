@@ -44,6 +44,13 @@
   <app-user-switch-dialog (closed)="shellUi.closeUserSwitchDialog()" />
 }
 
+@if (shellUi.invoiceGenerationDialogVisible()) {
+  @defer (on immediate) {
+    <app-invoice-generation-dialog
+      (closed)="shellUi.closeInvoiceGenerationDialog()" />
+  }
+}
+
 @if (windowClose.pending()) {
   <app-confirm-dialog
     title="Quitter sans enregistrer ?"

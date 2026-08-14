@@ -4,7 +4,7 @@
       <button type="button" class="activity-item"
               [class.active]="isActive(item.id)"
               [attr.aria-pressed]="isActive(item.id)"
-              [attr.aria-label]="item.label"
+              [attr.aria-label]="labelFor(item)"
               [title]="item.label"
               (click)="selected.emit(item.id)">
         @switch (item.id) {
@@ -22,6 +22,16 @@
               <circle cx="10.5" cy="10.5" r="6" />
               <path d="M15 15l6 6" />
             </svg>
+          }
+          @case ('jobs') {
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                 stroke-width="1.5" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.5" />
+              <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" />
+            </svg>
+            @if (jobActivity()) {
+              <span class="activity-badge" aria-hidden="true"></span>
+            }
           }
         }
       </button>

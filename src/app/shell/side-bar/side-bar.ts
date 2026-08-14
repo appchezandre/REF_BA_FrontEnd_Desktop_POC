@@ -1,10 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
 import { WorkspaceStore } from '../../core/workspace/workspace-store';
 import { RecentRecord, RecentRecordsService } from '../../core/shell/recent-records.service';
+import { ShellUiService } from '../../core/shell/shell-ui.service';
 import { TabType } from '../../shared/models/workspace';
 import { Icon, IconName } from '../../shared/components/icon/icon';
 import { OrdersSearch } from '../../features/orders/components/orders-search';
 import { UsersSearch } from '../../features/users/components/users-search';
+import { JobsPanel } from './jobs-panel/jobs-panel';
 import { ActivityView } from '../activity-bar/activity-bar';
 
 interface SideBarEntry {
@@ -20,17 +22,31 @@ interface ModuleLink {
   readonly entry: SideBarEntry;
 }
 
+/**
+ * Feuille « action » : déclenche un traitement (dialog, commande) au lieu
+ * d'ouvrir un onglet — p. ex. le lancement de la génération des factures.
+ */
+interface ModuleAction {
+  readonly kind: 'action';
+  readonly id: string;
+  readonly icon: IconName;
+  readonly title: string;
+}
+
+/** Enfant d'un groupe : écran ouvrable ou action. */
+type ModuleChild = ModuleLink | ModuleAction;
+
 /** Nœud groupe : un pictogramme, un titre et des enfants repliables. */
 interface ModuleGroup {
   readonly kind: 'group';
   readonly id: string;
   readonly title: string;
   readonly icon: IconName;
-  readonly children: readonly ModuleLink[];
+  readonly children: readonly ModuleChild[];
 }
 
-/** Nœud de premier niveau de « Modules » : écran isolé ou groupe. */
-type ModuleNode = ModuleLink | ModuleGroup;
+/** Nœud de premier niveau de « Modules » : écran isolé, action ou groupe. */
+type ModuleNode = ModuleChild | ModuleGroup;
 
 /**
  * Panneau latéral : explorateur des modules métier (arbre hiérarchique de
@@ -39,7 +55,7 @@ type ModuleNode = ModuleLink | ModuleGroup;
  */
 @Component({
   selector: 'app-side-bar',
-  imports: [OrdersSearch, UsersSearch, Icon],
+  imports: [OrdersSearch, UsersSearch, JobsPanel, Icon],
   templateUrl: './side-bar.html',
   styleUrl: './side-bar.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -47,6 +63,7 @@ type ModuleNode = ModuleLink | ModuleGroup;
 export class SideBar {
   private readonly store = inject(WorkspaceStore);
   private readonly recentRecords = inject(RecentRecordsService);
+  private readonly shellUi = inject(ShellUiService);
 
   readonly view = input.required<ActivityView>();
 
@@ -67,7 +84,13 @@ export class SideBar {
       icon: 'sales',
       children: [
         { kind: 'item', icon: 'customers', entry: { type: 'customer-list', title: 'Clients' } },
-        { kind: 'item', icon: 'orders', entry: { type: 'order-list', title: 'Commandes' } }
+        { kind: 'item', icon: 'orders', entry: { type: 'order-list', title: 'Commandes' } },
+        {
+          kind: 'action',
+          id: 'invoice-generation',
+          icon: 'invoice',
+          title: 'Génération Factures'
+        }
       ]
     },
     {
@@ -126,15 +149,22 @@ export class SideBar {
     });
   }
 
-  /** Clé de suivi `@for` d'un nœud de l'arbre (id de groupe ou type d'écran). */
+  /** Clé de suivi `@for` d'un nœud de l'arbre (id ou type d'écran). */
   protected nodeKey(node: ModuleNode): string {
-    return node.kind === 'group' ? node.id : node.entry.type;
+    return node.kind === 'item' ? node.entry.type : node.id;
   }
 
   /** Clic : ouvre ou réactive l'écran ; Ctrl+clic : nouvelle instance. */
   protected open(entry: SideBarEntry, event?: MouseEvent): void {
     const newInstance = event?.ctrlKey === true || event?.metaKey === true;
     this.store.openTab(entry, { newInstance });
+  }
+
+  /** Clic sur une feuille « action » : déclenche le traitement associé. */
+  protected runAction(id: string): void {
+    if (id === 'invoice-generation') {
+      this.shellUi.openInvoiceGenerationDialog();
+    }
   }
 
   /** Clic sur une fiche récente : la réouvre directement (via son conteneur). */

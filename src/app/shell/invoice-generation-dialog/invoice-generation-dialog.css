@@ -1,0 +1,103 @@
+/* Même plan que le dialog « Changer d'utilisateur » : sous le voile de
+   maintenance (z-index 2000), au-dessus des confirmations (1000). */
+.invoice-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.invoice-dialog {
+  width: min(360px, calc(100vw - 48px));
+  padding: 24px;
+  background: var(--vscode-dialog-bg);
+  border: 1px solid var(--vscode-dialog-border);
+  border-radius: 6px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+  color: var(--vscode-fg);
+}
+
+.invoice-dialog:focus {
+  outline: none;
+}
+
+.invoice-title {
+  margin: 0 0 8px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.invoice-subtitle {
+  margin: 0 0 16px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--vscode-fg-dim);
+}
+
+.invoice-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.field-label {
+  font-size: 12px;
+  color: var(--vscode-fg-dim);
+}
+
+.field select,
+.field input {
+  padding: 6px 8px;
+  border: 1px solid transparent;
+  background: var(--vscode-input-bg);
+  color: var(--vscode-fg);
+  font-size: 13px;
+}
+
+.field select:focus,
+.field input:focus {
+  outline: none;
+  border-color: var(--vscode-accent);
+}
+
+.invoice-error {
+  margin: 0;
+  font-size: 12px;
+  color: var(--vscode-error, #f48771);
+}
+
+.invoice-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.action-primary {
+  padding: 6px 14px;
+  border: none;
+  background: var(--vscode-accent);
+  color: #fff;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.action-secondary {
+  padding: 6px 14px;
+  border: none;
+  background: var(--vscode-button-secondary-bg, var(--vscode-input-bg));
+  color: var(--vscode-fg);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.action-primary:disabled {
+  opacity: 0.5;
+}

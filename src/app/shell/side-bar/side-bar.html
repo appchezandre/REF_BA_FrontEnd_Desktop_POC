@@ -26,6 +26,16 @@
                     <span class="side-bar-label">{{ node.entry.title }}</span>
                   </button>
                 </li>
+              } @else if (node.kind === 'action') {
+                <li>
+                  <button type="button" class="side-bar-item module-item"
+                          [title]="node.title"
+                          (click)="runAction(node.id)">
+                    <span class="twistie" aria-hidden="true"></span>
+                    <app-icon class="module-icon" [name]="node.icon" />
+                    <span class="side-bar-label">{{ node.title }}</span>
+                  </button>
+                </li>
               } @else {
                 <li>
                   <button type="button" class="group-toggle"
@@ -39,14 +49,23 @@
                   @if (isExpanded(node.id)) {
                     <ul [id]="'group-' + node.id" class="side-bar-list group-children"
                         role="list">
-                      @for (child of node.children; track child.entry.type) {
+                      @for (child of node.children; track nodeKey(child)) {
                         <li>
-                          <button type="button" class="side-bar-item child"
-                                  title="Clic : ouvrir — Ctrl+clic : nouvelle instance"
-                                  (click)="open(child.entry, $event)">
-                            <app-icon class="module-icon" [name]="child.icon" />
-                            <span class="side-bar-label">{{ child.entry.title }}</span>
-                          </button>
+                          @if (child.kind === 'item') {
+                            <button type="button" class="side-bar-item child"
+                                    title="Clic : ouvrir — Ctrl+clic : nouvelle instance"
+                                    (click)="open(child.entry, $event)">
+                              <app-icon class="module-icon" [name]="child.icon" />
+                              <span class="side-bar-label">{{ child.entry.title }}</span>
+                            </button>
+                          } @else {
+                            <button type="button" class="side-bar-item child"
+                                    [title]="child.title"
+                                    (click)="runAction(child.id)">
+                              <app-icon class="module-icon" [name]="child.icon" />
+                              <span class="side-bar-label">{{ child.title }}</span>
+                            </button>
+                          }
                         </li>
                       }
                     </ul>
@@ -119,6 +138,12 @@
             Ouvrez un écran pour effectuer une recherche contextuelle.
           </p>
         </div>
+      }
+    }
+    @case ('jobs') {
+      <div class="side-bar-header">Traitements en cours</div>
+      @defer (on immediate) {
+        <app-jobs-panel />
       }
     }
   }
